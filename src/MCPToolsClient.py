@@ -133,8 +133,9 @@ class MCPToolsClient:
 
         try: 
             # aivoke() method will automatically select & execute any matching tools
-            result = await self.agent.ainvoke({"messages": query})
-
+            with self.console.status("[bold green]Waiting for response from LLM...[/bold green]", spinner="dots"):
+                result = await self.agent.ainvoke({"messages": query})
+                
             # Improved response handling
             if isinstance(result, dict) and "messages" in result:
                 msgs = result.get("messages", [])
@@ -173,7 +174,19 @@ class MCPToolsClient:
             else:
                 useful = str(result)
 
-            self.console.print(Panel(f"[bold green]{useful}[/bold green]", title="Response", border_style="green"))
+            # Create a Markdown object from the useful text
+            markdown_content = Markdown(useful)
+            
+            # Create a Panel containing the Markdown object
+            response_panel = Panel(
+                markdown_content,
+                title="Response", 
+                border_style="green",
+                padding=(1, 2)
+            )
+            
+            # Print the panel with rendered Markdown
+            self.console.print(response_panel) 
         
         except Exception as e:
             self.console.print(f"[bold red]Error during interaction: {e}[/bold red]")
