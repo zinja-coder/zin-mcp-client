@@ -1,6 +1,6 @@
 <div align="center">
 
-# JADX-AI-MCP (Part of Zin's Reverse Engineering MCP Suite)
+# ZIN-MCP-CLIENT (Part of Zin's MCP Suite)
 
 ⚡ Fully automated MCP server + JADX plugin built to communicate with LLM through MCP to analyze Android APKs using LLMs like Claude — uncover vulnerabilities, parse manifests, and reverse engineer effortlessly.
 
