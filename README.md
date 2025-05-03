@@ -57,19 +57,14 @@ Installation Video
 ### 1. Downlaod from Releases: https://github.com/zinja-coder/zin-mcp-client/releases
 
 ```bash
-# 0. Download the jadx-ai-mcp-<version>.jar and jadx-mcp-server-<version>.zip
-https://github.com/zinja-coder/jadx-ai-mcp/releases
-
 # 1. 
-unzip jadx-ai-mcp-<version>.zip
+unzip zin-mcp-client-<version>.zip
 
-├jadx-mcp-server/
-  ├── jadx_mcp.py
-  ├── requirements.txt
+├zin-mcp-client/
+  ├── zin_mcp_client.py
+  ├── src/
   ├── README.md
   ├── LICENSE
-
-├jadx-ai-mcp-<version>.jar
 
 # 2. Install the plugin
 
