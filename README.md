@@ -16,8 +16,6 @@
 
 <!-- It is a still in early stage of development, so expects bugs, crashes and logical erros.-->
 
-<!-- Standalone Plugin for [JADX](https://github.com/skylot/jadx) (Started as Fork) with Model Context Protocol (MCP) integration for AI-powered static code analysis and real-time code review and reverse engineering tasks using Claude.-->
-
 <div align="center">
     <img alt="banner" height="480px" widht="620px" src="https://github.com/user-attachments/assets/0e8e0ecd-0520-422e-a007-03dc62c4118e">
 </div>
@@ -44,7 +42,6 @@ https://github.com/user-attachments/assets/fad3d994-8113-47df-b10c-54541a5c3aec
 https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
 
 
-
 # Features
 
 - **Multi-Server Support:** Connect to multiple MCP servers simultaneously
@@ -68,8 +65,6 @@ https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
 
 
 ## 🛠️ Getting Started 
-
-Installation Video
 
 ### 1. Downlaod from Releases: https://github.com/zinja-coder/zin-mcp-client/releases
 
@@ -233,7 +228,7 @@ https://github.com/user-attachments/assets/ee478917-c4f5-46fb-9f0e-ad31d7c33ee0
 
  - [ ] Add support exposing this client on network as well
 
- - [ ] Add more useful MCP Tools
+ - [ ] Store chat locally and provide chat history
 
  - [ ] **END-GOAL** : Make all reverse engineering MCP Servers, bring them together, to make reverse engineering as easy as possible purely from vibes.
 
