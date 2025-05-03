@@ -163,16 +163,7 @@ Below is the sample configuration file for Zin MCP Suite Servers:
                 "run",
                 "apktool_mcp_server.py"
             ]
-	    },
-        "browser-bruter-mcp-server": {
-            "command": "/path/to/uv",
-            "args": [
-                "--directory",
-                "/path/to/BrowserBruter/modules/mcp/",
-                "run",
-                "browser_bruter_mcp_server.py"
-            ]
-        }
+	}
     }
 }
 ```
@@ -241,7 +232,7 @@ However, the open-source world is advancing rapidly! Models specifically fine-tu
 ## To report bugs, issues, feature suggestion, Performance issue, general question, Documentation issue.
  - Kindly open an issue with respective template.
 
- - Tested on Mac OS and Linux environment with Zin MCP Servers. (jadx-mcp-server, apktool-mcp-server)
+ - Tested on Mac OS and Linux environment with jadx-mcp-server
 
 ## 🙏 Credits
 
