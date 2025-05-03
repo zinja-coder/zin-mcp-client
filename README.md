@@ -2,14 +2,13 @@
 
 # ZIN-MCP-CLIENT (Part of Zin's MCP Suite)
 
-⚡ Fully automated MCP server + JADX plugin built to communicate with LLM through MCP to analyze Android APKs using LLMs like Claude — uncover vulnerabilities, parse manifests, and reverse engineer effortlessly.
+⚡ Lightweight, Fast, Simple, CLI-Based MCP Client for STDIO MCP Servers, to fill the gap and provide bridge between your local LLMs running Ollama and MCP Servers.
 
-![GitHub contributors JADX-AI-MCP](https://img.shields.io/github/contributors/zinja-coder/jadx-ai-mcp)
-![GitHub contributors JADX-MCP-SERVER](https://img.shields.io/github/contributors/zinja-coder/jadx-mcp-server)
-![GitHub all releases](https://img.shields.io/github/downloads/zinja-coder/jadx-ai-mcp/total)
-![GitHub release (latest by SemVer)](https://img.shields.io/github/downloads/zinja-coder/jadx-ai-mcp/latest/total)
-![Latest release](https://img.shields.io/github/release/zinja-coder/jadx-ai-mcp.svg)
-![Java 11+](https://img.shields.io/badge/Java-11%2B-blue)
+![GitHub contributors JADX-AI-MCP](https://img.shields.io/github/contributors/zinja-coder/zin-mcp-client)
+![GitHub contributors JADX-MCP-SERVER](https://img.shields.io/github/contributors/zinja-coder/zin-mcp-client)
+![GitHub all releases](https://img.shields.io/github/downloads/zinja-coder/zin-mcp-client/total)
+![GitHub release (latest by SemVer)](https://img.shields.io/github/downloads/zinja-coder/zin-mcp-client/latest/total)
+![Latest release](https://img.shields.io/github/release/zinja-coder/zin-mcp-client.svg)
 ![Python 3.10+](https://img.shields.io/badge/python-3%2E10%2B-blue)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
