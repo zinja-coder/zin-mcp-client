@@ -26,23 +26,11 @@
 
 ---
 
-## 🤖 What is JADX-AI-MCP?
+## 🤖 What is ZIN MCP Client?
 
-**JADX-AI-MCP** is a plugin for the [JADX decompiler](https://github.com/skylot/jadx) that integrates directly with [Model Context Protocol (MCP)](https://github.com/anthropic/mcp) to provide **live reverse engineering support with LLMs like Claude**.
-
-Think: "Decompile → Context-Aware Code Review → AI Recommendations" — all in real time.
+A powerful yet lightweight, fast, simple and flexible client for interacting with MCP (Model Context Protocol) servers through local LLMs. This tool allows you to connect to and utilize various tools from multiple MCP servers through an easy-to-use command-line interface.
 
 Watch the demos!
-
-
-https://github.com/user-attachments/assets/b65c3041-fde3-4803-8d99-45ca77dbe30a
-
-https://github.com/user-attachments/assets/c184afae-3713-4bc0-a1d0-546c1f4eb57f
-
-
-It is combination of two tools:
-1. JADX-AI-MCP
-2. [JADX MCP SERVER](https://github.com/zinja-coder/jadx-mcp-server)
 
 ## 🤖 What is JADX-MCP-SERVER?
 
@@ -50,8 +38,9 @@ It is combination of two tools:
 
 ---
 
-# Other MCP Servers For Android Reverse Engineering
+# Check the Zin MCP Suite
  - **[APKTool-MCP-Server](https://github.com/zinja-coder/apktool-mcp-server)**
+ - **[JADX-MCP-Server](https://github.com/zinja-coder/jadx-mcp-server)**
 
 ## Current MCP Tools
 
