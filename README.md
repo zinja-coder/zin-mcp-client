@@ -220,6 +220,12 @@ https://github.com/user-attachments/assets/ee478917-c4f5-46fb-9f0e-ad31d7c33ee0
 
 - If you can not resolve the error on you own, use the logs and debug mode's output and provide them to us by opening an issue at https://github.com/zinja-coder/zin-mcp-client/issues
 
+Current State Of Local LLM and MCPs:
+
+Currently, proprietary API-based models like Anthropic’s Claude tend to be more proficient proficient at tool calling. 
+
+However, the open-source world is advancing rapidly! Models specifically fine-tuned on function calling datasets are becoming increasingly available through Ollama. Researching models tagged with `function calling` or `tool use` on platforms like Hugging Face or [checking discussions on communities like r/LocalLLaMA is key to finding capable local options.](https://www.reddit.com/r/LocalLLaMA/search/?q=Best+open+source+LLM+for+function+calling+mcp&cId=c72f65d2-d327-41b0-8e6d-73e889385cda&iId=795a5a92-245d-42d2-ae60-47dfff7dbef0)
+
 ---
 
 ## 🛣️ Future Roadmap
