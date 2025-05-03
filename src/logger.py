@@ -29,7 +29,7 @@ class Logger:
         self.logger = logging.getLogger("zin_mcp_client")
 
         # Suppress specific external loggers
-        self.suppress_external_loggers()
+        #self.suppress_external_loggers()
 
         # log startup information
         if self.debug_mode:
@@ -89,22 +89,23 @@ class Logger:
         return logger
     
     # Suppress logs from external libraries.
-    def suppress_external_loggers(self):
+    #def suppress_external_loggers(self):
         
         # Suppress httpx logs (HTTP request/response logs)
-        #logging.getLogger("httpx").setLevel(logging.DEBUG)
-        logging.getLogger("langchain_ollama").setLevel(logging.DEBUG)
+    #    logging.getLogger("httpx").setLevel(logging.DEBUG)
+    #    logging.getLogger("langchain_ollama").setLevel(logging.DEBUG)
         
         # Suppress httpcore logs (lower level HTTP logs)
-        #logging.getLogger("httpcore").setLevel(logging.DEBUG)
+    #    logging.getLogger("httpcore").setLevel(logging.DEBUG)
         
         # Suppress other common noisy libraries
-        #logging.getLogger("urllib3").setLevel(logging.DEBUG)
-        #logging.getLogger("asyncio").setLevel(logging.DEBUG)
-        #logging.getLogger("mcp").setLevel(logging.DEBUG)
-        #logging.getLogger("langchain").setLevel(logging.DEBUG)
-        #logging.getLogger("langchain_core").setLevel(logging.DEBUG)
-        #logging.getLogger("langgraph").setLevel(logging.DEBUG)
+    #    logging.getLogger("urllib3").setLevel(logging.DEBUG)
+    #    logging.getLogger("asyncio").setLevel(logging.DEBUG)
+    #    logging.getLogger("mcp").setLevel(logging.DEBUG)
+    #    logging.getLogger("langchain_mcp_adapters.tools").setLevel(logging.DEBUG)
+    #    logging.getLogger("langchain").setLevel(logging.DEBUG)
+    #    logging.getLogger("langchain_core").setLevel(logging.DEBUG)
+    #    logging.getLogger("langgraph").setLevel(logging.DEBUG)
 
     # debug the raw data objects
     def debug(self, message: str, data: Optional[object] = None):
