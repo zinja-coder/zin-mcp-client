@@ -4,6 +4,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import logging
+import platform
 
 from rich.console import Console
 from rich.panel import Panel
@@ -11,6 +12,9 @@ from rich.prompt import Prompt
 from rich.table import Table
 
 from src.mcp_tools_client import MCPToolsClient
+
+if platform.system() != "Windows":
+    import readline
 
 # This class is used for handling the interative cli session
 class InteractiveCLI:

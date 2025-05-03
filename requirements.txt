@@ -1,0 +1,8 @@
+fastmcp
+httpx
+logging
+langchain_mcp_adapters
+langgraph
+langchain_ollama
+rich
+typer
