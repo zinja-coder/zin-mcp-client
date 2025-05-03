@@ -32,9 +32,16 @@ A powerful yet lightweight, fast, simple and flexible client for interacting wit
 
 Watch the demos!
 
-## 🤖 What is JADX-MCP-SERVER?
 
-**JADX MCP Server** is a standalone Python server that interacts with a `JADX-AI-MCP` plugin (see: [jadx-ai-mcp](https://github.com/zinja-coder/jadx-ai-mcp)) via MCP (Model Context Protocol). It lets LLMs communicate with the decompiled Android app context live.
+# Features
+
+- **Multi-Server Support:** Connect to multiple MCP servers simultaneously
+- **Local LLM Integration:** Use local LLMs via Ollama for privacy and control
+- **Interactive CLI:** Clean, intuitive command-line interface with rich formatting
+- **Comprehensive Logging:** Detailed logs for debugging and troubleshooting
+- **ReAct Agent Framework:** Utilizes LangChain's ReAct agent pattern to intelligently invoke tools
+- **Cross Platform:** Cross Platform Support
+- **Simple, Fast, Lightweight:** It is simple, it is fast, it is lightweight
 
 ---
 
@@ -42,88 +49,12 @@ Watch the demos!
  - **[APKTool-MCP-Server](https://github.com/zinja-coder/apktool-mcp-server)**
  - **[JADX-MCP-Server](https://github.com/zinja-coder/jadx-mcp-server)**
 
-## Current MCP Tools
-
-The following MCP tools are available:
-
-- `fetch_current_class()` — Get the class name and full source of selected class
-- `get_selected_text()` — Get currently selected text
-- `get_all_classes()` — List all classes in the project
-- `get_class_source()` — Get full source of a given class
-- `get_method_by_name()` — Fetch a method’s source
-- `search_method_by_name()` — Search method across classes
-- `get_methods_of_class()` — List methods in a class
-- `get_fields_of_class()` — List fields in a class
-- `get_smali_of_class()` — Fetch smali of class
-- `get_main_activity_class()` — Fetch main activity from jadx mentioned in AndroidManifest.xml file.
-- `get_main_application_classes_code()` — Fetch all the main application classes' code based on the package name defined in the AndroidManifest.xml.
-- `get_main_application_classes_names()` — Fetch all the main application classes' names based on the package name defined in the AndroidManifest.xml.
-- `get_android_manifest()` — Retrieve and return the AndroidManifest.xml content.
----
-
-## 🗒️ Sample Prompts
-
-🔍 Basic Code Understanding
-
-    "Explain what this class does in one paragraph."
-
-    "Summarize the responsibilities of this method."
-
-    "Is there any obfuscation in this class?"
-
-    "List all Android permissions this class might require."
-
-🛡️ Vulnerability Detection
-
-    "Are there any insecure API usages in this method?"
-
-    "Check this class for hardcoded secrets or credentials."
-
-    "Does this method sanitize user input before using it?"
-
-    "What security vulnerabilities might be introduced by this code?"
-
-🛠️ Reverse Engineering Helpers
-
-    "Deobfuscate and rename the classes and methods to something readable."
-
-    "Can you infer the original purpose of this smali method?"
-
-    "What libraries or SDKs does this class appear to be part of?"
-
-📦 Static Analysis
-
-    "List all network-related API calls in this class."
-
-    "Identify file I/O operations and their potential risks."
-
-    "Does this method leak device info or PII?"
-
-🤖 AI Code Modification
-
-    "Refactor this method to improve readability."
-
-    "Add comments to this code explaining each step."
-
-    "Rewrite this Java method in Python for analysis."
-
-📄 Documentation & Metadata
-
-    "Generate Javadoc-style comments for all methods."
-
-    "What package or app component does this class likely belong to?"
-
-    "Can you identify the Android component type (Activity, Service, etc.)?"
----
 
 ## 🛠️ Getting Started 
 
-### 1. Downlaod from Releases: https://github.com/zinja-coder/jadx-ai-mcp/releases
+Installation Video
 
-> [!NOTE]
->
-> Download both `jadx-ai-mcp-<version>.jar` and `jadx-mcp-server-<version>.zip` files.
-
+### 1. Downlaod from Releases: https://github.com/zinja-coder/zin-mcp-client/releases
 
 ```bash
 # 0. Download the jadx-ai-mcp-<version>.jar and jadx-mcp-server-<version>.zip
