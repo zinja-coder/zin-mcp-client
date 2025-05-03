@@ -145,7 +145,7 @@ class MCPToolsClient:
             
             except Exception as e:
                 self.log.error(f"Error initializing {server_name}: {str(e)}", exc_info=True)
-                self.consol.print(f"[bold red]Error Initializing {server_name}: {e}[/bold red]")
+                self.console.print(f"[bold red]Error Initializing {server_name}: {e}[/bold red]")
             
         return initialized_servers > 0
     
@@ -245,7 +245,7 @@ class MCPToolsClient:
 
                         # Show message metadata if available
                         if hasattr(msg, "additional_kwargs") and msg.additional_kwargs:
-                            self.consol.print(Panel(
+                            self.console.print(Panel(
                                 JSON(json.dumps(msg.additional_kwargs, ident=2)),
                                 title=f"[bold cyan]Message {i} Metadata/[bold cyan]",
                                 board_style="blue"

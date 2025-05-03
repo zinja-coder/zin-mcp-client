@@ -28,6 +28,9 @@ class Logger:
         # getting the logger for this module
         self.logger = logging.getLogger("zin_mcp_client")
 
+        # Suppress specific external loggers
+        self.suppress_external_loggers()
+
         # log startup information
         if self.debug_mode:
             self.logger.info(f"logging, initialized. Log file: {self.log_file} \nDebug mode enabled - verbose output enabled")
@@ -85,6 +88,24 @@ class Logger:
 
         return logger
     
+    # Suppress logs from external libraries.
+    def suppress_external_loggers(self):
+        
+        # Suppress httpx logs (HTTP request/response logs)
+        #logging.getLogger("httpx").setLevel(logging.DEBUG)
+        logging.getLogger("langchain_ollama").setLevel(logging.DEBUG)
+        
+        # Suppress httpcore logs (lower level HTTP logs)
+        #logging.getLogger("httpcore").setLevel(logging.DEBUG)
+        
+        # Suppress other common noisy libraries
+        #logging.getLogger("urllib3").setLevel(logging.DEBUG)
+        #logging.getLogger("asyncio").setLevel(logging.DEBUG)
+        #logging.getLogger("mcp").setLevel(logging.DEBUG)
+        #logging.getLogger("langchain").setLevel(logging.DEBUG)
+        #logging.getLogger("langchain_core").setLevel(logging.DEBUG)
+        #logging.getLogger("langgraph").setLevel(logging.DEBUG)
+
     # debug the raw data objects
     def debug(self, message: str, data: Optional[object] = None):
         # Log debug message with optional data object
