@@ -35,8 +35,6 @@ Watch the demos!
 
 https://github.com/user-attachments/assets/fad3d994-8113-47df-b10c-54541a5c3aec
 
-
-
 - **Perform Code Review to Find Vulnerabilities locally**
 
 https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
@@ -200,11 +198,13 @@ uv run zin_mcp_client.py --server jadx-mcp-server --model llama3.1:8b --config /
 uv run zin_mcp_client.py
 ```
 
-
-
 2. Use `--server` option to specify server of your choice, use `--config` option to provide path to your config file, use `--model` option to use specific model, use `--debug` to enable verbose output
 
 ## If something went wrong - DEBUG and Troubleshooting
+
+> [!NOTE]
+> 
+>  For low spec systems, use only one server at a time to avoid LLM hallucinations.
 
 1. Look the logs:
 
