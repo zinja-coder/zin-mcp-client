@@ -18,7 +18,11 @@
 
 <!-- Standalone Plugin for [JADX](https://github.com/skylot/jadx) (Started as Fork) with Model Context Protocol (MCP) integration for AI-powered static code analysis and real-time code review and reverse engineering tasks using Claude.-->
 
-![jadx-ai-banner.png](docs/assets/img.png) Image generated using AI tools.
+<div align="center">
+    <img alt="banner" height="480px" widht="620px" src="https://github.com/user-attachments/assets/0e8e0ecd-0520-422e-a007-03dc62c4118e">
+</div>
+
+ Image generated using AI tools.
 
 ---
 
