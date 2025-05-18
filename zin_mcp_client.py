@@ -7,7 +7,8 @@
 #   "langgraph",
 #   "langchain_ollama",
 #   "rich",
-#   "typer"
+#   "typer",
+#   "prompt_toolkit"
 # ]
 # ///
 

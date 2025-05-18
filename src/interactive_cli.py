@@ -4,17 +4,19 @@ See the file 'LICENSE' for copying permission
 """
 
 import logging
-import platform
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
+from prompt_toolkit import PromptSession
+
+
 from rich.table import Table
 
 from src.mcp_tools_client import MCPToolsClient
 
-if platform.system() != "Windows":
-    import readline
+
+session = PromptSession()
 
 # This class is used for handling the interative cli session
 class InteractiveCLI:
@@ -40,7 +42,7 @@ class InteractiveCLI:
 
         while True:
             try:
-                command = Prompt.ask("\n[bold blue]︻デ═一××>[/bold blue] ")
+                command = await session.prompt_async("\n>>> ")#Prompt.ask("\n[bold blue]>>>[/bold blue] ")#prompt("\n>>> ")
                 self.log.debug(f"Command Received: {command}")
 
                 if command.lower() in ('/exit', '/quit'):
