@@ -39,6 +39,10 @@ https://github.com/user-attachments/assets/fad3d994-8113-47df-b10c-54541a5c3aec
 
 https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
 
+- **Supports Multiple Servers - [GhidraMCP Server](https://github.com/LaurieWired/GhidraMCP)**
+  
+https://github.com/user-attachments/assets/759f7138-1cc5-400f-b7e2-a6a7f0dca894
+
 
 # Features
 
