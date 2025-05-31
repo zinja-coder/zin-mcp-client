@@ -47,7 +47,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global variable to store config path
-CONFIG_PATH = "web_mcp_config.json"
+CONFIG_PATH = "mcp_config.json"
 
 
 @asynccontextmanager
@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     await client.close()
 
 # Initialize FastAPI app with lifespan
-app = FastAPI(title="Web MCP Client", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Zin MCP Client", version="1.0.0", lifespan=lifespan)
 
 # Global client instance - will be initialized with proper config path
 client = None
@@ -88,6 +88,10 @@ class ToolInfo(BaseModel):
 
 class ModelInfo(BaseModel):
     name: str
+
+# Add new Pydantic model for server selection
+class ServerSelectionRequest(BaseModel):
+    server_names: List[str]
 
 # Web MCP Client class
 class WebMCPClient:
@@ -268,7 +272,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web MCP Client</title>
+    <title>🥷 Web MCP Client</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -590,30 +594,74 @@ button:disabled {
     font-style: italic;
 }
 
+.server-checkboxes {
+    border: 2px solid #2c2c2c;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #111;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.server-checkbox-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    padding: 5px;
+}
+
+.server-checkbox-item input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.server-checkbox-item label {
+    margin: 0;
+    cursor: pointer;
+    flex: 1;
+}
+
+.server-checkbox-item:hover {
+    background-color: #1a1a1a;
+    border-radius: 4px;
+}
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌐 Web MCP Client</h1>
+            <h1>🥷 Web MCP Client</h1>
             <p>Model Context Protocol Client with Web Interface</p>
         </div>
 
         <!-- Initialization Section -->
         <div class="section">
-            <h3>🚀 Initialize System</h3>
-            <div class="form-group">
-                <label for="modelSelect">Select LLM Model:</label>
-                <select id="modelSelect">
-                    <option value="">Click "Load Models" to fetch available models</option>
-                </select>
-            </div>
-            <div class="inline-form">
-                <button onclick="loadModels()" style="flex: 0 0 150px;">Load Models</button>
-                <button id="initBtn" onclick="initializeSystem()" disabled>Initialize System</button>
-            </div>
-            <div id="initStatus"></div>
+    <h3>Initialize System</h3>
+    <div class="form-group">
+        <label for="modelSelect">Select LLM Model:</label>
+        <select id="modelSelect">
+            <option value="">Click "Load Models" to fetch available models</option>
+        </select>
+    </div>
+    
+    <!-- New MCP Server Selection Section -->
+    <div class="form-group">
+        <label>Select MCP Servers to Initialize:</label>
+        <div id="serverCheckboxes" class="server-checkboxes">
+            <p>Loading available servers...</p>
         </div>
+        <button onclick="loadAvailableServers()" style="margin-top: 10px;">Load Available Servers</button>
+    </div>
+    
+    <div class="inline-form">
+        <button onclick="loadModels()" style="flex: 0 0 150px;">Load Models</button>
+        <button id="initBtn" onclick="initializeSystem()" disabled>Initialize System</button>
+    </div>
+    <div id="initStatus"></div>
+</div>
+
 
         <!-- Chat Section -->
         <div class="section">
@@ -657,6 +705,8 @@ button:disabled {
         // Initialize on page load
         window.onload = function() {
             testConnection();
+            loadModels();
+            loadAvailableServers();
         };
 
         function getApiEndpoint() {
@@ -705,75 +755,137 @@ button:disabled {
             }
         }
 
-        async function initializeSystem() {
-            const modelSelect = document.getElementById('modelSelect');
-            const selectedModel = modelSelect.value;
-            
-            if (!selectedModel) {
-                showStatus('initStatus', 'Please select a model first', 'error');
-                return;
-            }
+        // Add new JavaScript functions for server selection
 
-            const initBtn = document.getElementById('initBtn');
-            initBtn.disabled = true;
-            initBtn.textContent = 'Initializing...';
+        let availableServers = [];
 
-            try {
-                // Initialize LLM
-                showStatus('initStatus', 'Initializing LLM...', 'info');
-                const llmResponse = await fetch(`${apiEndpoint}/api/initialize-llm`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: selectedModel })
-                });
-
-                if (!llmResponse.ok) {
-                    const error = await llmResponse.json().catch(() => ({}));
-                    throw new Error(error.detail || `HTTP ${llmResponse.status}`);
-                }
-
-                // Initialize servers
-                showStatus('initStatus', 'Initializing MCP servers...', 'info');
-                const serversResponse = await fetch(`${apiEndpoint}/api/initialize-servers`, {
-                    method: 'POST'
-                });
-
-                if (!serversResponse.ok) {
-                    const error = await serversResponse.json().catch(() => ({}));
-                    throw new Error(error.detail || `HTTP ${serversResponse.status}`);
-                }
-
-                // Create agent
-                showStatus('initStatus', 'Creating agent...', 'info');
-                const agentResponse = await fetch(`${apiEndpoint}/api/create-agent`, {
-                    method: 'POST'
-                });
-
-                if (!agentResponse.ok) {
-                    const error = await agentResponse.json().catch(() => ({}));
-                    throw new Error(error.detail || `HTTP ${agentResponse.status}`);
-                }
-
-                showStatus('initStatus', 'System initialized successfully!', 'success');
-                systemInitialized = true;
-                document.getElementById('sendBtn').disabled = false;
-                document.getElementById('queryInput').disabled = false;
-                
-                // Add success message to chat
-                addMessage('System initialized successfully! You can now start chatting.', 'system');
-                
-                // Load system info
-                await loadSystemInfo();
-
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showStatus('initStatus', `Initialization failed: ${error.message}`, 'error');
-                addMessage(`Initialization failed: ${error.message}`, 'system');
-            } finally {
-                initBtn.disabled = false;
-                initBtn.textContent = 'Initialize System';
-            }
+async function loadAvailableServers() {
+    const container = document.getElementById('serverCheckboxes');
+    const loadBtn = event.target;
+    
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Loading...';
+    container.innerHTML = '<p>Loading available servers...</p>';
+    
+    try {
+        const response = await fetch(`${apiEndpoint}/api/available-servers`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        availableServers = data.servers;
+        
+        if (availableServers && availableServers.length > 0) {
+            let checkboxHtml = '';
+            availableServers.forEach(server => {
+                checkboxHtml += `
+                    <div class="server-checkbox-item">
+                        <input type="checkbox" id="server_${server}" value="${server}" checked>
+                        <label for="server_${server}">${server}</label>
+                    </div>
+                `;
+            });
+            container.innerHTML = checkboxHtml;
+            showStatus('initStatus', `Found ${availableServers.length} available servers`, 'success');
+        } else {
+            container.innerHTML = '<p>No MCP servers found in configuration</p>';
+            showStatus('initStatus', 'No MCP servers found in configuration', 'warning');
+        }
+    } catch (error) {
+        console.error('Error loading available servers:', error);
+        container.innerHTML = '<p>Error loading servers</p>';
+        showStatus('initStatus', `Failed to load servers: ${error.message}`, 'error');
+    } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = 'Load Available Servers';
+    }
+}
+
+function getSelectedServers() {
+    const checkboxes = document.querySelectorAll('#serverCheckboxes input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Modified initializeSystem function
+async function initializeSystem() {
+    const modelSelect = document.getElementById('modelSelect');
+    const selectedModel = modelSelect.value;
+    
+    if (!selectedModel) {
+        showStatus('initStatus', 'Please select a model first', 'error');
+        return;
+    }
+
+    const selectedServers = getSelectedServers();
+    if (selectedServers.length === 0) {
+        showStatus('initStatus', 'Please select at least one MCP server', 'error');
+        return;
+    }
+
+    const initBtn = document.getElementById('initBtn');
+    initBtn.disabled = true;
+    initBtn.textContent = 'Initializing...';
+
+    try {
+        // Initialize LLM
+        showStatus('initStatus', 'Initializing LLM...', 'info');
+        const llmResponse = await fetch(`${apiEndpoint}/api/initialize-llm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: selectedModel })
+        });
+
+        if (!llmResponse.ok) {
+            const error = await llmResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${llmResponse.status}`);
+        }
+
+        // Initialize selected servers
+        showStatus('initStatus', `Initializing selected MCP servers: ${selectedServers.join(', ')}...`, 'info');
+        const serversResponse = await fetch(`${apiEndpoint}/api/initialize-servers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ server_names: selectedServers })
+        });
+
+        if (!serversResponse.ok) {
+            const error = await serversResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${serversResponse.status}`);
+        }
+
+        // Create agent
+        showStatus('initStatus', 'Creating agent...', 'info');
+        const agentResponse = await fetch(`${apiEndpoint}/api/create-agent`, {
+            method: 'POST'
+        });
+
+        if (!agentResponse.ok) {
+            const error = await agentResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${agentResponse.status}`);
+        }
+
+        showStatus('initStatus', `System initialized successfully with servers: ${selectedServers.join(', ')}!`, 'success');
+        systemInitialized = true;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('queryInput').disabled = false;
+        
+        // Add success message to chat
+        addMessage(`System initialized successfully with MCP servers: ${selectedServers.join(', ')}! You can now start chatting.`, 'system');
+        
+        // Load system info
+        await loadSystemInfo();
+
+    } catch (error) {
+        console.error('Initialization error:', error);
+        showStatus('initStatus', `Initialization failed: ${error.message}`, 'error');
+        addMessage(`Initialization failed: ${error.message}`, 'system');
+    } finally {
+        initBtn.disabled = false;
+        initBtn.textContent = 'Initialize System';
+    }
+}
 
         async function sendQuery() {
             if (!systemInitialized) {
@@ -923,6 +1035,7 @@ button:disabled {
             // Adding a basic implementation
             try {
                 const response = await fetch(`${apiEndpoint}/api/models`);
+
                 console.log('API connection test:', response.ok ? 'Success' : 'Failed');
             } catch (error) {
                 console.log('API connection test failed:', error.message);
@@ -955,13 +1068,30 @@ async def initialize_llm(request: dict):
     
     return {"status": "success", "message": f"LLM initialized with model: {model}"}
 
+# Add new API endpoint to get available servers from config
+@app.get("/api/available-servers")
+async def get_available_servers():
+    """Get list of available MCP servers from config"""
+    servers = list(client.config.get("mcpServers", {}).keys())
+    return {"servers": servers}
+
+# Modify the initialize-servers endpoint to accept server selection
 @app.post("/api/initialize-servers")
-async def initialize_servers():
-    success = await client.initialize_servers()
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to initialize MCP servers")
+async def initialize_servers(request: ServerSelectionRequest = None):
+    server_names = None
+    if request and request.server_names:
+        server_names = request.server_names
     
-    return {"status": "success", "message": "MCP servers initialized"}
+    success = await client.initialize_servers(server_names)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to initialize selected MCP servers")
+    
+    selected_servers = server_names or list(client.config.get("mcpServers", {}).keys())
+    return {
+        "status": "success", 
+        "message": f"MCP servers initialized: {', '.join(selected_servers)}",
+        "initialized_servers": selected_servers
+    }
 
 @app.post("/api/create-agent")
 async def create_agent():
