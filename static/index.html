@@ -23,7 +23,6 @@
             <div class="form-group">
                 <label for="modelSelect">Select LLM Model:</label>
                 <select id="modelSelect">
-                    <option value="">Click "Load Models" to fetch available models</option>
                 </select>
             </div>
             
@@ -33,11 +32,9 @@
                 <div id="serverCheckboxes" class="server-checkboxes">
                     <p>Loading available servers...</p>
                 </div>
-                <button onclick="loadAvailableServers()" style="margin-top: 10px;">Load Available Servers</button>
             </div>
             
             <div class="inline-form">
-                <button onclick="loadModels()" style="flex: 0 0 150px;">Load Models</button>
                 <button id="initBtn" onclick="initializeSystem()" disabled>Initialize System</button>
             </div>
             <div id="initStatus"></div>

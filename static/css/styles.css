@@ -409,3 +409,8 @@ button:disabled {
     margin: 10px 0;
     border-left: 4px solid #f59e0b;
 }
+/* Layout Flex Container */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}

@@ -9,6 +9,7 @@ let systemInitialized = false;
 let apiEndpoint = 'http://localhost:8000';
 let availableServers = [];
 
+
 // Initialize on page load
 window.onload = function() {
     testConnection();
@@ -335,6 +336,49 @@ async function loadSystemInfo() {
         document.getElementById('serversInfo').innerHTML = '<p class="status error">Error loading server information</p>';
         document.getElementById('toolsInfo').innerHTML = '<p class="status error">Error loading tools information</p>';
     }
+}
+
+
+async function loadAvailableTools() {
+    const container = document.getElementById('toolCheckboxes');
+    container.innerHTML = '<p>Loading available tools...</p>';
+    
+    try {
+        const response = await fetch(`${apiEndpoint}/api/available-tools`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        availableTools = data.tools;
+        
+        if (availableTools && availableTools.length > 0) {
+            let checkboxHtml = '';
+            availableTools.forEach(tool => {
+                checkboxHtml += `
+                    <div class="tool-checkbox-item">
+                        <input type="checkbox" id="tool_${tool.name}" value="${tool.name}" checked>
+                        <label for="tool_${tool.name}" title="${tool.description}">
+                            ${tool.name} <small>(${tool.server})</small>
+                        </label>
+                    </div>
+                `;
+            });
+            container.innerHTML = checkboxHtml;
+            document.getElementById('toolSelectionSection').style.display = 'block';
+        } else {
+            container.innerHTML = '<p>No tools available</p>';
+        }
+    } catch (error) {
+        console.error('Error loading available tools:', error);
+        container.innerHTML = '<p>Error loading tools</p>';
+    }
+}
+
+function getSelectedTools() {
+    const checkboxes = document.querySelectorAll('#toolCheckboxes input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
 }
 
 function showStatus(elementId, message, type) {
