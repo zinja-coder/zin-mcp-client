@@ -933,13 +933,6 @@ button:disabled {
 </html>
 """
 
-# Startup event to initialize client with proper config
-@app.on_event("startup")
-async def startup_event():
-    global client
-    client = WebMCPClient(CONFIG_PATH)
-    logger.info(f"Application started with config: {CONFIG_PATH}")
-
 # Routes
 @app.get("/", response_class=HTMLResponse)
 async def get_homepage():
@@ -990,11 +983,6 @@ async def get_servers():
 @app.get("/api/tools")
 async def get_tools():
     return client.get_tools_info()
-
-# Cleanup on shutdown
-@app.on_event("shutdown")
-async def shutdown_event():
-    await client.close()
 
 import uvicorn
 import argparse
