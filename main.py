@@ -34,6 +34,7 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
 
 from mcp import ClientSession
 from mcp.client.stdio import stdio_client, StdioServerParameters
@@ -48,8 +49,21 @@ logger = logging.getLogger(__name__)
 # Global variable to store config path
 CONFIG_PATH = "web_mcp_config.json"
 
-# Initialize FastAPI app
-app = FastAPI(title="Web MCP Client", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    global client
+    client = WebMCPClient(CONFIG_PATH)
+    logger.info(f"Application started with config: {CONFIG_PATH}")
+    
+    yield
+    
+    # Shutdown
+    await client.close()
+
+# Initialize FastAPI app with lifespan
+app = FastAPI(title="Web MCP Client", version="1.0.0", lifespan=lifespan)
 
 # Global client instance - will be initialized with proper config path
 client = None
