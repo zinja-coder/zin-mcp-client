@@ -1,0 +1,452 @@
+# /// script
+# dependencies = [
+#   "fastmcp",
+#   "httpx",
+#   "logging",
+#   "langchain_mcp_adapters",
+#   "langgraph",
+#   "langchain_ollama",
+#   "rich",
+#   "typer",
+#   "prompt_toolkit",
+#   "fastapi",
+#   "uvicorn",
+#   "langchain",
+#   "pydantic",
+#   "python-multipart",
+#   "aiofiles",
+#   "python-json-logger"
+# ]
+# ///
+
+"""
+Web MCP Client - FastAPI Backend
+Copyright (c) 2025 Web MCP Client Developer(s)
+"""
+
+import json
+import httpx
+import logging
+import asyncio
+from typing import List, Dict, Optional
+from contextlib import AsyncExitStack
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
+from contextlib import asynccontextmanager
+
+from mcp import ClientSession
+from mcp.client.stdio import stdio_client, StdioServerParameters
+from langchain_mcp_adapters.tools import load_mcp_tools
+from langgraph.prebuilt import create_react_agent
+from langchain_ollama import ChatOllama
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Global variable to store config path
+CONFIG_PATH = "mcp_config.json"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    global client
+    client = WebMCPClient(CONFIG_PATH)
+    logger.info(f"Application started with config: {CONFIG_PATH}")
+    
+    yield
+    
+    # Shutdown
+    await client.close()
+
+# Initialize FastAPI app with lifespan
+app = FastAPI(title="Zin MCP Client", version="1.0.0", lifespan=lifespan)
+
+# Global client instance - will be initialized with proper config path
+client = None
+
+# Serve static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Pydantic models for API
+class QueryRequest(BaseModel):
+    query: str
+
+class ServerInfo(BaseModel):
+    name: str
+    status: str
+    tools_count: int
+
+class ToolInfo(BaseModel):
+    name: str
+    description: str
+    server: str
+
+class ModelInfo(BaseModel):
+    name: str
+
+# Add new Pydantic model for server selection
+class ServerSelectionRequest(BaseModel):
+    server_names: List[str]
+
+# Web MCP Client class
+class WebMCPClient:
+    def __init__(self, config_path: str):
+        self.config_path = config_path
+        self.config = self._load_config()
+        self.sessions = {}
+        self.tools_by_server = {}
+        self.llm = None
+        self.agent = None
+        self.selected_model = None
+        self._exit_stack = AsyncExitStack()
+        
+        logger.info(f"WebMCPClient initialized with config from {config_path}")
+
+    def _load_config(self) -> dict:
+        try:
+            with open(self.config_path, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"Config file not found at {self.config_path}")
+            return {"mcpServers": {}}
+
+    async def get_ollama_models(self) -> List[str]:
+        logger.info("Fetching Ollama models")
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("http://127.0.0.1:11434/api/tags")
+                data = response.json()
+                models = [model["name"] for model in data.get("models", [])]
+                logger.info(f"Found {len(models)} Ollama models")
+                return models
+        except (httpx.ConnectError, httpx.RequestError) as e:
+            logger.error(f"Failed to connect to Ollama API: {str(e)}")
+            return []
+
+    async def initialize_servers(self, server_names: List[str] = None) -> bool:
+        if not self.config.get("mcpServers"):
+            logger.error("No MCP Servers configured")
+            return False
+
+        servers = self.config["mcpServers"]
+        server_names = server_names or list(servers.keys())
+
+        logger.info(f"Initializing Servers: {', '.join(server_names)}")
+        initialized_servers = 0
+        
+        for server_name in server_names:
+            if server_name not in servers:
+                logger.warning(f"Server '{server_name}' not found in config")
+                continue
+
+            server_config = servers[server_name]
+            command = server_config.get("command")
+            args = server_config.get("args", [])
+
+            logger.info(f"Initializing {server_name}")
+            server_params = StdioServerParameters(command=command, args=args)
+
+            try:
+                server_stack = AsyncExitStack()
+                reader, writer = await server_stack.enter_async_context(stdio_client(server_params))
+                session = await server_stack.enter_async_context(ClientSession(reader, writer))
+                await session.initialize()
+                await self._exit_stack.enter_async_context(server_stack)
+
+                self.sessions[server_name] = session
+                tools = await load_mcp_tools(session)
+                self.tools_by_server[server_name] = tools
+
+                initialized_servers += 1
+                logger.info(f"Server {server_name} initialized with {len(tools)} tools")
+            
+            except Exception as e:
+                logger.error(f"Error initializing {server_name}: {str(e)}")
+            
+        return initialized_servers > 0
+
+    async def initialize_llm(self, model_name: str) -> bool:
+        logger.info(f"Initializing LLM with model: {model_name}")
+        try:
+            self.llm = ChatOllama(model=model_name)
+            self.selected_model = model_name
+            logger.info("LLM initialized successfully")
+            return True
+        except Exception as e:
+            logger.error(f"Error initializing LLM: {str(e)}")
+            return False
+
+    async def create_agent(self) -> bool:
+        logger.info("Creating agent with tools and LLM")
+        if not self.llm:
+            logger.error("LLM not initialized")
+            return False
+        
+        all_tools = [tool for tools in self.tools_by_server.values() for tool in tools]
+        if not all_tools:
+            logger.error("No Tools available")
+            return False
+        
+        try:
+            self.agent = create_react_agent(self.llm, all_tools)
+            logger.info(f"Agent created successfully with {len(all_tools)} tools")
+            return True
+        except Exception as e:
+            logger.error(f"Error creating agent: {str(e)}")
+            return False
+
+    async def run_interaction(self, query: str) -> str:
+        logger.info(f"Running interaction with query: {query}")
+        if not self.agent:
+            raise HTTPException(status_code=400, detail="Agent not initialized")
+
+        try:
+            input_data = {"messages": query}
+            result = await self.agent.ainvoke(input_data)
+
+            # Extract response content
+            if isinstance(result, dict) and "messages" in result:
+                msgs = result.get("messages", [])
+                
+                # Look for the last non-empty AIMessage
+                for m in reversed(msgs):
+                    if hasattr(m, "__class__") and m.__class__.__name__ == "AIMessage":
+                        content = getattr(m, "content", "").strip()
+                        if content:
+                            return content
+                
+                # Fall back to tool messages
+                for m in reversed(msgs):
+                    if hasattr(m, "__class__") and m.__class__.__name__ == "ToolMessage":
+                        content = getattr(m, "content", "").strip()
+                        if content:
+                            return content
+                
+                return "No response content received from LLM"
+            else:
+                return str(result)
+        
+        except Exception as e:
+            if "does not support tools" in str(e):
+                raise HTTPException(status_code=400, detail="This model does not support tool calling")
+            else:
+                logger.error(f"Error during interaction: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error during interaction: {str(e)}")
+
+    def get_servers_info(self) -> List[ServerInfo]:
+        servers_info = []
+        for server_name in self.sessions:
+            tools_count = len(self.tools_by_server.get(server_name, []))
+            servers_info.append(ServerInfo(
+                name=server_name,
+                status="Connected",
+                tools_count=tools_count
+            ))
+        return servers_info
+
+    def get_tools_info(self) -> List[ToolInfo]:
+        tools_info = []
+        for server_name, tools in self.tools_by_server.items():
+            for tool in tools:
+                tools_info.append(ToolInfo(
+                    name=tool.name,
+                    description=tool.description,
+                    server=server_name
+                ))
+        return tools_info
+
+    async def cleanup_sessions(self, server_names_to_keep: List[str] = None):
+        """Clean up existing sessions, optionally keeping only specified servers"""
+        logger.info("Cleaning up existing MCP server sessions")
+        
+        if server_names_to_keep is None:
+            # Close all sessions
+            servers_to_remove = list(self.sessions.keys())
+        else:
+            # Close only sessions not in the keep list
+            servers_to_remove = [name for name in self.sessions.keys() if name not in server_names_to_keep]
+        
+        for server_name in servers_to_remove:
+            if server_name in self.sessions:
+                try:
+                    # The session will be closed when the exit stack is closed
+                    del self.sessions[server_name]
+                    if server_name in self.tools_by_server:
+                        del self.tools_by_server[server_name]
+                    logger.info(f"Cleaned up session for server: {server_name}")
+                except Exception as e:
+                    logger.error(f"Error cleaning up session for {server_name}: {str(e)}")
+        
+        # Close and recreate the exit stack to properly cleanup connections
+        if servers_to_remove:
+            await self._exit_stack.aclose()
+            self._exit_stack = AsyncExitStack()
+    
+    def reset_agent(self):
+        """Reset the agent to None"""
+        logger.info("Resetting agent")
+        self.agent = None
+    
+    async def reinitialize_servers(self, server_names: List[str]) -> bool:
+        """Clean up existing sessions and initialize new ones"""
+        logger.info(f"Reinitializing servers: {', '.join(server_names)}")
+        
+        # Clean up existing sessions
+        await self.cleanup_sessions()
+        
+        # Reset agent
+        self.reset_agent()
+        
+        # Initialize new servers
+        return await self.initialize_servers(server_names)
+
+    async def close(self):
+        logger.info("Closing all MCP server connections")
+        await self._exit_stack.aclose()
+
+HTML_TEMPLATE = "<sample></sample>"
+
+
+# Routes
+@app.get("/", response_class=HTMLResponse)
+async def get_homepage():
+    return HTML_TEMPLATE
+
+@app.get("/api/models")
+async def get_models():
+    models = await client.get_ollama_models()
+    return [ModelInfo(name=model) for model in models]
+
+@app.post("/api/initialize-llm")
+async def initialize_llm(request: dict):
+    model = request.get("model")
+    if not model:
+        raise HTTPException(status_code=400, detail="Model name is required")
+    
+    success = await client.initialize_llm(model)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to initialize LLM")
+    
+    return {"status": "success", "message": f"LLM initialized with model: {model}"}
+
+# Add new API endpoint to get available servers from config
+@app.get("/api/available-servers")
+async def get_available_servers():
+    """Get list of available MCP servers from config"""
+    servers = list(client.config.get("mcpServers", {}).keys())
+    return {"servers": servers}
+
+# Modify the initialize-servers endpoint to accept server selection
+@app.post("/api/initialize-servers")
+async def initialize_servers(request: ServerSelectionRequest = None):
+    server_names = None
+    if request and request.server_names:
+        server_names = request.server_names
+    
+    success = await client.initialize_servers(server_names)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to initialize selected MCP servers")
+    
+    selected_servers = server_names or list(client.config.get("mcpServers", {}).keys())
+    return {
+        "status": "success", 
+        "message": f"MCP servers initialized: {', '.join(selected_servers)}",
+        "initialized_servers": selected_servers
+    }
+
+@app.post("/api/create-agent")
+async def create_agent():
+    success = await client.create_agent()
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to create agent")
+    
+    return {"status": "success", "message": "Agent created successfully"}
+
+@app.post("/api/query")
+async def process_query(request: QueryRequest):
+    response = await client.run_interaction(request.query)
+    return {"response": response}
+
+@app.get("/api/servers")
+async def get_servers():
+    return client.get_servers_info()
+
+@app.get("/api/tools")
+async def get_tools():
+    return client.get_tools_info()
+
+# Add new API endpoint for reinitialization
+@app.post("/api/reinitialize-servers")
+async def reinitialize_servers(request: ServerSelectionRequest):
+    """Reinitialize servers with cleanup of existing ones"""
+    if not request.server_names:
+        raise HTTPException(status_code=400, detail="At least one server must be selected")
+    
+    success = await client.reinitialize_servers(request.server_names)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to reinitialize MCP servers")
+    
+    return {
+        "status": "success", 
+        "message": f"MCP servers reinitialized: {', '.join(request.server_names)}",
+        "initialized_servers": request.server_names
+    }
+
+# Add endpoint to check initialization status
+@app.get("/api/status")
+async def get_system_status():
+    """Get current system status"""
+    return {
+        "llm_initialized": client.llm is not None,
+        "selected_model": client.selected_model,
+        "agent_created": client.agent is not None,
+        "active_servers": list(client.sessions.keys()),
+        "total_tools": sum(len(tools) for tools in client.tools_by_server.values())
+    }
+
+import uvicorn
+import argparse
+import sys
+import os
+
+def main():
+    global CONFIG_PATH
+    
+    parser = argparse.ArgumentParser(description="Web MCP Client")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
+    parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
+    parser.add_argument("--config", default="mcp_config.json", help="Path to MCP configuration file")
+    
+    args = parser.parse_args()
+    
+    # Set the global CONFIG_PATH before starting the server
+    CONFIG_PATH = args.config
+    
+    # Verify config file exists
+    if not os.path.exists(CONFIG_PATH):
+        print(f"Error: Configuration file '{CONFIG_PATH}' not found!")
+        print("Please create the configuration file or specify a valid path with --config")
+        sys.exit(1)
+    
+    print(f"Starting Web MCP Client server...")
+    print(f"Config file: {CONFIG_PATH}")
+    print(f"Host: {args.host}")
+    print(f"Port: {args.port}")
+    print(f"Open your browser to: http://{args.host}:{args.port}")
+    
+    # Start the FastAPI server
+    uvicorn.run(
+        "main:app",
+        host=args.host,
+        port=args.port,
+        reload=False,
+        log_level="info"
+    )
+
+if __name__ == "__main__":
+    main()

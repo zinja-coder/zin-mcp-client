@@ -89,9 +89,18 @@ class ToolInfo(BaseModel):
 class ModelInfo(BaseModel):
     name: str
 
-# Add new Pydantic model for server selection
 class ServerSelectionRequest(BaseModel):
     server_names: List[str]
+    
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate_to_json
+
+    @classmethod
+    def validate_to_json(cls, value):
+        if isinstance(value, str):
+            value = json.loads(value)
+        return value
 
 # Web MCP Client class
 class WebMCPClient:
@@ -260,9 +269,64 @@ class WebMCPClient:
                 ))
         return tools_info
 
+    async def cleanup_sessions(self, server_names_to_keep: List[str] = None):
+        """Clean up existing sessions, optionally keeping only specified servers"""
+        logger.info("Cleaning up existing MCP server sessions")
+    
+        if server_names_to_keep is None:
+            # Close all sessions
+            servers_to_remove = list(self.sessions.keys())
+        else:
+            # Close only sessions not in the keep list
+            servers_to_remove = [name for name in self.sessions.keys() if name not in server_names_to_keep]
+    
+        for server_name in servers_to_remove:
+            if server_name in self.sessions:
+                try:
+                    # Simply remove from our tracking - let the exit stack handle cleanup
+                    del self.sessions[server_name]
+                    if server_name in self.tools_by_server:
+                        del self.tools_by_server[server_name]
+                    logger.info(f"Cleaned up session for server: {server_name}")
+                except Exception as e:
+                    logger.error(f"Error cleaning up session for {server_name}: {str(e)}")
+    
+        # Only close the exit stack if we're removing all servers
+        if server_names_to_keep is None or len(servers_to_remove) == len(self.sessions):
+            try:
+                await self._exit_stack.aclose()
+            except Exception as e:
+                logger.error(f"Error closing exit stack: {str(e)}")
+            finally:
+                self._exit_stack = AsyncExitStack()
+    
+    def reset_agent(self):
+        """Reset the agent to None"""
+        logger.info("Resetting agent")
+        self.agent = None
+    
+    async def reinitialize_servers(self, server_names: List[str]) -> bool:
+        try:
+            """Clean up existing sessions and initialize new ones"""
+            logger.info(f"Reinitializing servers: {', '.join(server_names)}")
+        
+            # Clean up existing sessions
+            await self.cleanup_sessions()
+        
+            # Reset agent
+            self.reset_agent()
+        
+            # Initialize new servers
+            return await self.initialize_servers(server_names)
+        except Exception as e:
+            logger.error(f"Error in reinitialize: {e}")
+
     async def close(self):
         logger.info("Closing all MCP server connections")
-        await self._exit_stack.aclose()
+        try:
+            await self._exit_stack.aclose()
+        except Exception as e:
+            logger.error(f"Error during cleanup: {str(e)}")
 
 
 # HTML template for the frontend
@@ -627,6 +691,33 @@ button:disabled {
     border-radius: 4px;
 }
 
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.status-item {
+    padding: 8px 12px;
+    border-radius: 5px;
+    background-color: #1a1a1a;
+    border: 1px solid #2c2c2c;
+}
+
+.status-item strong {
+    color: #22c55e;
+}
+
+.reinit-warning {
+    background-color: #3a2c14;
+    color: #fefcbf;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #f59e0b;
+}
+
     </style>
 </head>
 <body>
@@ -638,7 +729,7 @@ button:disabled {
 
         <!-- Initialization Section -->
         <div class="section">
-    <h3>Initialize System</h3>
+    <h3>🚀 Initialize System</h3>
     <div class="form-group">
         <label for="modelSelect">Select LLM Model:</label>
         <select id="modelSelect">
@@ -646,7 +737,7 @@ button:disabled {
         </select>
     </div>
     
-    <!-- New MCP Server Selection Section -->
+    <!-- MCP Server Selection Section -->
     <div class="form-group">
         <label>Select MCP Servers to Initialize:</label>
         <div id="serverCheckboxes" class="server-checkboxes">
@@ -658,8 +749,10 @@ button:disabled {
     <div class="inline-form">
         <button onclick="loadModels()" style="flex: 0 0 150px;">Load Models</button>
         <button id="initBtn" onclick="initializeSystem()" disabled>Initialize System</button>
+        <button id="reinitBtn" onclick="reinitializeServers()" disabled style="display: none;">Reinitialize Servers</button>
     </div>
     <div id="initStatus"></div>
+ 
 </div>
 
 
@@ -699,6 +792,13 @@ button:disabled {
     </div>
 
     <script>
+    // Global variables to track system state
+let currentActiveServers = [];
+let systemStatus = {
+    llm_initialized: false,
+    agent_created: false,
+    active_servers: []
+};
         let systemInitialized = false;
         let apiEndpoint = 'http://localhost:8000';
 
@@ -714,57 +814,64 @@ button:disabled {
         }
 
         async function loadModels() {
-            const select = document.getElementById('modelSelect');
-            const loadBtn = event.target;
-            
-            // Update UI
-            loadBtn.disabled = true;
-            loadBtn.textContent = 'Loading...';
-            select.innerHTML = '<option value="">Loading models...</option>';
-            
-            try {
-                const response = await fetch(`${apiEndpoint}/api/models`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const models = await response.json();
-                select.innerHTML = '';
-                
-                if (models && models.length > 0) {
-                    models.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.name || model;
-                        option.textContent = model.name || model;
-                        select.appendChild(option);
-                    });
-                    showStatus('initStatus', `Loaded ${models.length} models successfully!`, 'success');
-                    document.getElementById('initBtn').disabled = false;
-                } else {
-                    select.innerHTML = '<option value="">No models found - Check Ollama installation</option>';
-                    showStatus('initStatus', 'No models found. Please install models in Ollama first.', 'warning');
-                }
-            } catch (error) {
-                console.error('Error loading models:', error);
-                select.innerHTML = '<option value="">Error loading models</option>';
-                showStatus('initStatus', `Failed to load models: ${error.message}`, 'error');
-            } finally {
-                loadBtn.disabled = false;
-                loadBtn.textContent = 'Load Models';
-            }
+    const select = document.getElementById('modelSelect');
+    const loadBtn = document.getElementById('loadModelsBtn'); // Get button by ID instead of event.target
+    
+    // Update UI
+    if (loadBtn) {
+        loadBtn.disabled = true;
+        loadBtn.textContent = 'Loading...';
+    }
+    select.innerHTML = '<option value="">Loading models...</option>';
+    
+    try {
+        const response = await fetch(`${apiEndpoint}/api/models`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const models = await response.json();
+        select.innerHTML = '';
+        
+        if (models && models.length > 0) {
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.name || model;
+                option.textContent = model.name || model;
+                select.appendChild(option);
+            });
+            showStatus('initStatus', `Loaded ${models.length} models successfully!`, 'success');
+            document.getElementById('initBtn').disabled = false;
+        } else {
+            select.innerHTML = '<option value="">No models found - Check Ollama installation</option>';
+            showStatus('initStatus', 'No models found. Please install models in Ollama first.', 'warning');
+        }
+    } catch (error) {
+        console.error('Error loading models:', error);
+        select.innerHTML = '<option value="">Error loading models</option>';
+        showStatus('initStatus', `Failed to load models: ${error.message}`, 'error');
+    } finally {
+        if (loadBtn) {
+            loadBtn.disabled = false;
+            loadBtn.textContent = 'Load Models';
+        }
+    }
+}
 
         // Add new JavaScript functions for server selection
 
         let availableServers = [];
 
+// Modified loadAvailableServers to add change listeners
 async function loadAvailableServers() {
     const container = document.getElementById('serverCheckboxes');
-    const loadBtn = event.target;
+    const loadBtn = document.getElementById('loadServersBtn'); // Get button by ID instead of event.target
     
-    loadBtn.disabled = true;
-    loadBtn.textContent = 'Loading...';
+    if (loadBtn) {
+        loadBtn.disabled = true;
+        loadBtn.textContent = 'Loading...';
+    }
     container.innerHTML = '<p>Loading available servers...</p>';
     
     try {
@@ -798,8 +905,10 @@ async function loadAvailableServers() {
         container.innerHTML = '<p>Error loading servers</p>';
         showStatus('initStatus', `Failed to load servers: ${error.message}`, 'error');
     } finally {
-        loadBtn.disabled = false;
-        loadBtn.textContent = 'Load Available Servers';
+        if (loadBtn) {
+            loadBtn.disabled = false;
+            loadBtn.textContent = 'Load Available Servers';
+        }
     }
 }
 
@@ -868,8 +977,13 @@ async function initializeSystem() {
 
         showStatus('initStatus', `System initialized successfully with servers: ${selectedServers.join(', ')}!`, 'success');
         systemInitialized = true;
+        currentActiveServers = [...selectedServers];
+        
+        // Enable chat and show reinitialize option
         document.getElementById('sendBtn').disabled = false;
         document.getElementById('queryInput').disabled = false;
+        document.getElementById('reinitBtn').style.display = 'inline-block';
+        document.getElementById('reinitBtn').disabled = false;
         
         // Add success message to chat
         addMessage(`System initialized successfully with MCP servers: ${selectedServers.join(', ')}! You can now start chatting.`, 'system');
@@ -884,6 +998,87 @@ async function initializeSystem() {
     } finally {
         initBtn.disabled = false;
         initBtn.textContent = 'Initialize System';
+    }
+}
+
+// New function for reinitialization
+async function reinitializeServers() {
+    const selectedServers = getSelectedServers();
+    if (selectedServers.length === 0) {
+        showStatus('initStatus', 'Please select at least one MCP server', 'error');
+        return;
+    }
+
+    // Check if selection has changed
+    const serversChanged = JSON.stringify(selectedServers.sort()) !== JSON.stringify(currentActiveServers.sort());
+    if (!serversChanged) {
+        showStatus('initStatus', 'Server selection unchanged. No reinitialization needed.', 'info');
+        return;
+    }
+
+    const reinitBtn = document.getElementById('reinitBtn');
+    reinitBtn.disabled = true;
+    reinitBtn.textContent = 'Reinitializing...';
+
+    // Disable chat during reinitialization
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('queryInput').disabled = true;
+
+    try {
+        showStatus('initStatus', `Cleaning up existing servers and reinitializing with: ${selectedServers.join(', ')}...`, 'info');
+        
+        // Add warning message to chat
+        addMessage(`Reinitializing system with new server selection: ${selectedServers.join(', ')}. Previous agent will be replaced.`, 'system');
+
+        const serversResponse = await fetch(`${apiEndpoint}/api/reinitialize-servers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ server_names: selectedServers })
+        });
+
+        if (!serversResponse.ok) {
+            const error = await serversResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${serversResponse.status}`);
+        }
+
+        // Create new agent
+        showStatus('initStatus', 'Creating new agent with selected servers...', 'info');
+        const agentResponse = await fetch(`${apiEndpoint}/api/create-agent`, {
+            method: 'POST'
+        });
+
+        if (!agentResponse.ok) {
+            const error = await agentResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${agentResponse.status}`);
+        }
+
+        currentActiveServers = [...selectedServers];
+        
+        showStatus('initStatus', `System reinitialized successfully with servers: ${selectedServers.join(', ')}!`, 'success');
+        
+        // Re-enable chat
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('queryInput').disabled = false;
+        
+        // Add success message to chat
+        addMessage(`System reinitialized successfully! Now using MCP servers: ${selectedServers.join(', ')}`, 'system');
+        
+        // Reload system info
+        await loadSystemInfo();
+
+    } catch (error) {
+        console.error('Reinitialization error:', error);
+        showStatus('initStatus', `Reinitialization failed: ${error.message}`, 'error');
+        addMessage(`Reinitialization failed: ${error.message}`, 'system');
+        
+        // Try to restore chat functionality if possible
+        if (systemInitialized) {
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('queryInput').disabled = false;
+        }
+    } finally {
+        reinitBtn.disabled = false;
+        reinitBtn.textContent = 'Reinitialize Servers';
     }
 }
 
@@ -1113,6 +1308,40 @@ async def get_servers():
 @app.get("/api/tools")
 async def get_tools():
     return client.get_tools_info()
+
+@app.post("/api/reinitialize-servers")
+async def reinitialize_servers(request: ServerSelectionRequest):
+    """Reinitialize servers with cleanup of existing ones"""
+    try:
+        if not request or not request.server_names:
+            raise HTTPException(status_code=400, detail="At least one server must be selected")
+        
+        success = await client.reinitialize_servers(request.server_names)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to reinitialize MCP servers")
+        
+        return {
+            "status": "success", 
+            "message": f"MCP servers reinitialized: {', '.join(request.server_names)}",
+            "initialized_servers": request.server_names
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in reinitialize_servers: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+# Add endpoint to check initialization status
+@app.get("/api/status")
+async def get_system_status():
+    """Get current system status"""
+    return {
+        "llm_initialized": client.llm is not None,
+        "selected_model": client.selected_model,
+        "agent_created": client.agent is not None,
+        "active_servers": list(client.sessions.keys()),
+        "total_tools": sum(len(tools) for tools in client.tools_by_server.values())
+    }
 
 import uvicorn
 import argparse
