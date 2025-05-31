@@ -10,17 +10,167 @@ let apiEndpoint = 'http://localhost:8000';
 let availableServers = [];
 
 
-// Initialize on page load
-window.onload = function() {
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSidebar();
+    initializeTextarea();
+    
+    // Update the existing window.onload to include new initialization
     testConnection();
     loadModels();
     loadAvailableServers();
-};
+});
 
 function getApiEndpoint() {
     return document.getElementById('apiEndpoint') ? 
         document.getElementById('apiEndpoint').value || 'http://localhost:8000' : 
         'http://localhost:8000';
+}
+
+// Sidebar and mobile menu functionality
+function initializeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Mobile menu toggle
+    mobileMenuBtn?.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+    });
+    
+    // Close sidebar when clicking overlay
+    sidebarOverlay?.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+    });
+}
+
+// Accordion functionality
+function toggleAccordion(accordionId) {
+    const accordion = document.getElementById(accordionId);
+    const isActive = accordion.classList.contains('active');
+    
+    // Close all accordions
+    document.querySelectorAll('.accordion-content').forEach(acc => {
+        acc.classList.remove('active');
+    });
+    
+    // Open clicked accordion if it wasn't active
+    if (!isActive) {
+        accordion.classList.add('active');
+    }
+}
+
+// Auto-resize textarea
+function initializeTextarea() {
+    const textarea = document.getElementById('queryInput');
+    
+    textarea.addEventListener('input', function() {
+        // Reset height to calculate new height
+        this.style.height = 'auto';
+        
+        // Set new height based on scroll height
+        const newHeight = Math.min(this.scrollHeight, 200);
+        this.style.height = newHeight + 'px';
+    });
+    
+    // Handle Enter key for sending
+    textarea.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!this.disabled && this.value.trim()) {
+                sendQuery();
+            }
+        }
+    });
+}
+
+// Enhanced message rendering with avatars
+function addMessage(content, type) {
+    const chatContainer = document.getElementById('chatContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    
+    // Create avatar
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar';
+    
+    switch(type) {
+        case 'user':
+            avatarDiv.textContent = '👤';
+            break;
+        case 'assistant':
+            avatarDiv.textContent = '🤖';
+            break;
+        case 'system':
+            avatarDiv.textContent = '⚙️';
+            break;
+        default:
+            avatarDiv.textContent = '💬';
+    }
+    
+    // Create content
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    if (type === 'assistant' || type === 'system') {
+        marked.setOptions({
+            gfm: true,
+            breaks: true,
+            highlight: function(code, lang) {
+                if (lang && Prism.languages[lang]) {
+                    return Prism.highlight(code, Prism.languages[lang], lang);
+                }
+                return code;
+            }
+        });
+        
+        contentDiv.innerHTML = marked.parse(content);
+        
+        setTimeout(() => {
+            Prism.highlightAllUnder(contentDiv);
+        }, 10);
+    } else {
+        contentDiv.textContent = content;
+        contentDiv.style.whiteSpace = 'pre-wrap';
+    }
+    
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(contentDiv);
+    chatContainer.appendChild(messageDiv);
+    
+    // Smooth scroll to bottom
+    chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+// Enhanced loading indicator
+function showLoading(show = true) {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const sendBtn = document.getElementById('sendBtn');
+    const queryInput = document.getElementById('queryInput');
+    
+    if (show) {
+        loadingIndicator.style.display = 'flex';
+        sendBtn.disabled = true;
+        queryInput.disabled = true;
+    } else {
+        loadingIndicator.style.display = 'none';
+        sendBtn.disabled = false;
+        queryInput.disabled = false;
+    }
 }
 
 async function loadModels() {
@@ -219,6 +369,7 @@ async function initializeSystem() {
     }
 }
 
+// Update the existing sendQuery function to use new loading indicator
 async function sendQuery() {
     if (!systemInitialized) {
         alert('Please initialize the system first');
@@ -235,10 +386,9 @@ async function sendQuery() {
 
     addMessage(query, 'user');
     queryInput.value = '';
+    queryInput.style.height = 'auto'; // Reset textarea height
 
-    document.getElementById('loadingIndicator').style.display = 'block';
-    document.getElementById('sendBtn').disabled = true;
-    document.getElementById('queryInput').disabled = true;
+    showLoading(true);
 
     try {
         const response = await fetch(`${apiEndpoint}/api/query`, {
@@ -259,9 +409,7 @@ async function sendQuery() {
         console.error('Query error:', error);
         addMessage(`Error: ${error.message}`, 'assistant');
     } finally {
-        document.getElementById('loadingIndicator').style.display = 'none';
-        document.getElementById('sendBtn').disabled = false;
-        document.getElementById('queryInput').disabled = false;
+        showLoading(false);
     }
 }
 
