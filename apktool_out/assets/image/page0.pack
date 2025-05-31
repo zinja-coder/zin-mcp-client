@@ -1,0 +1,145 @@
+
+page0.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 0, 462
+  size: 640, 384
+  orig: 640, 384
+  offset: 0, 0
+  index: -1
+leveldone
+  rotate: false
+  xy: 0, 111
+  size: 455, 351
+  orig: 455, 351
+  offset: 0, 0
+  index: -1
+ready
+  rotate: false
+  xy: 0, 0
+  size: 551, 111
+  orig: 551, 111
+  offset: 0, 0
+  index: -1
+gameover
+  rotate: false
+  xy: 455, 111
+  size: 370, 351
+  orig: 370, 351
+  offset: 0, 0
+  index: -1
+alienboss
+  rotate: false
+  xy: 640, 718
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+explosion
+  rotate: false
+  xy: 551, 47
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+explosion
+  rotate: false
+  xy: 640, 654
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+explosion
+  rotate: false
+  xy: 768, 782
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+player
+  rotate: false
+  xy: 615, 63
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+playershield
+  rotate: false
+  xy: 640, 606
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+playerShot
+  rotate: false
+  xy: 704, 662
+  size: 32, 56
+  orig: 32, 56
+  offset: 0, 0
+  index: -1
+coin
+  rotate: false
+  xy: 551, 5
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 4
+coin
+  rotate: false
+  xy: 551, 5
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 2
+coin
+  rotate: false
+  xy: 768, 740
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 5
+coin
+  rotate: false
+  xy: 768, 740
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 1
+coin
+  rotate: false
+  xy: 663, 69
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 0
+coin
+  rotate: false
+  xy: 640, 564
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: 3
+alien
+  rotate: false
+  xy: 736, 686
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+alienShot
+  rotate: false
+  xy: 688, 630
+  size: 16, 24
+  orig: 16, 24
+  offset: 0, 0
+  index: -1
+particle
+  rotate: false
+  xy: 704, 642
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1

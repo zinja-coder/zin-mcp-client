@@ -1,0 +1,152 @@
+Signature-Version: 1.0
+SHA1-Digest-Manifest-Main-Attributes: v8q3lNaWtIt5aiWjl+oF90VvtwE=
+Created-By: 1.7.0_75 (Oracle Corporation)
+SHA1-Digest-Manifest: i0k/T54jdXkcA1Eg8K+7l9IYJGE=
+
+Name: res/drawable-xxhdpi-v4/ic_launcher.png
+SHA1-Digest: vNAwhZ4xNMYSMcDwU0DLhaS7sDY=
+
+Name: com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl
+SHA1-Digest: HcrAcuBE0S5aKfEh9pSnSkZ/aDk=
+
+Name: assets/skin/uiskin.png
+SHA1-Digest: omh4CJB91hO2dkfGxn+Ma0FJsJU=
+
+Name: assets/font/large.fnt
+SHA1-Digest: e+btSbPRnHIL6W00+iNd6uh+YOY=
+
+Name: assets/sound/alienshot.ogg
+SHA1-Digest: HU7Uc0b5Gb8kmtAe2BwZSrjB5m0=
+
+Name: assets/skin/default.png
+SHA1-Digest: t4CFJNNtY9LxTILtyeHEWfNpXCI=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl
+SHA1-Digest: B7Syss3zu86U1ZFVLp0aU7dm5b0=
+
+Name: assets/sound/alienexplosion.ogg
+SHA1-Digest: fRLjOU9IEkRtP2aDGTi6+ErxwCE=
+
+Name: resources.arsc
+SHA1-Digest: KVYUTl3vEL1d1Gx3GYTLwdOBnhU=
+
+Name: META-INF/buildserverid
+SHA1-Digest: gpHz84s3r906SHnmNtgZpaxyfCo=
+
+Name: res/drawable-hdpi-v4/ic_launcher.png
+SHA1-Digest: VLqdgvk2G42f0kQgN6kSirY/tm8=
+
+Name: res/drawable-mdpi-v4/ic_launcher.png
+SHA1-Digest: f37f5WyJnkhyc3xBQcXSLedCp5c=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl
+SHA1-Digest: oDfQkYNflB57q8y2Bqrrwcvphlg=
+
+Name: assets/font/small.fnt
+SHA1-Digest: frCPjaZ8wqhygHl1rAktI86ydCU=
+
+Name: assets/font/large.png
+SHA1-Digest: JF097n8hIZ0e96r/+tVwdMcWkd0=
+
+Name: AndroidManifest.xml
+SHA1-Digest: IgGDmzTKsVrIHRshNZvrNDjUw94=
+
+Name: assets/skin/uiskin.json
+SHA1-Digest: b1m5bCp++/j3pBONl+yW7cTX6ns=
+
+Name: lib/x86/libgdx.so
+SHA1-Digest: KxBSicM9JYvwFbKR8oYWvG7VFc0=
+
+Name: assets/sound/click.ogg
+SHA1-Digest: 7/yFYdImO5FuTqgnpxEj7Pfecaw=
+
+Name: assets/sound/playershot.ogg
+SHA1-Digest: nPQIxeiKcfmPpb7YsBKcN33csCA=
+
+Name: assets/sound/playerexplosion.ogg
+SHA1-Digest: SIKoZhdNT1EYx342/LK3BLsws9Y=
+
+Name: assets/sound/alienbossexplosion.ogg
+SHA1-Digest: eiHJFWDBPfl81LXEkEV9LupzDro=
+
+Name: assets/image/page0.png
+SHA1-Digest: pihI8NcaBc1PKoyP94i3nuxq/nc=
+
+Name: assets/sound/alienbosshit.ogg
+SHA1-Digest: r60lpnefyGju01xUqh7nRSpEtxo=
+
+Name: assets/font/medium.fnt
+SHA1-Digest: zLbIMnAxGI2Tud9y4dqNFSwOvCU=
+
+Name: assets/skin/uiskin.atlas
+SHA1-Digest: JohTrs+9qYdE4jU6oO8HhY9uAx4=
+
+Name: assets/music/game.ogg
+SHA1-Digest: T5W5W8xjG46XKRPgYH4pX0nQfIA=
+
+Name: com/badlogic/gdx.gwt.xml
+SHA1-Digest: e1MdbQFHa+/yI9gLrMA1pfIkKVQ=
+
+Name: assets/font/small.png
+SHA1-Digest: JR7+SJyLP6cRf+xlftlqmwDdSrE=
+
+Name: assets/music/menu.ogg
+SHA1-Digest: ImX1RSqbfIftBIdwhikw2n/ckhQ=
+
+Name: assets/splash.jpg
+SHA1-Digest: PnmAaxlli1xlPnHlGh2JF9lMT5k=
+
+Name: com/badlogic/gdx/utils/JsonReader.rl
+SHA1-Digest: IQQsWoNl/XQGsR2d3WsjELK7s/Q=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl
+SHA1-Digest: AqRJA/2OFee7amNQ5NZn77eUCYE=
+
+Name: com/badlogic/gdx/utils/XmlReader.rl
+SHA1-Digest: 1wpP5g6N/Lspjbf9ozGM8y2GWPY=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl
+SHA1-Digest: //peP3ieaLy1IvnfuExcDIjsfSg=
+
+Name: assets/image/page0.pack
+SHA1-Digest: ib6zYt+jqfcJMFb8ER2dcTIB5os=
+
+Name: com/badlogic/gdx/utils/arial-15.png
+SHA1-Digest: zcxc3DgP9Ynv4SOhoUV2qAKs6oo=
+
+Name: META-INF/fdroidserverid
+SHA1-Digest: 7dQ95ejrZfTQ+wPPTzVaQnaDtCs=
+
+Name: classes.dex
+SHA1-Digest: 5Wuzh470AFJe74GqXkixzIKKuCo=
+
+Name: lib/armeabi/libgdx.so
+SHA1-Digest: 5qgHo41skDtPNEnpENRaaSduob8=
+
+Name: assets/sound/boing.ogg
+SHA1-Digest: 7IYx+CmD2gK2V+urjMKyRzocHko=
+
+Name: assets/sound/alienexplosion_.ogg
+SHA1-Digest: 42yoGpdHmJ1ytsf7zL5cf6SFjz4=
+
+Name: com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl
+SHA1-Digest: y+2eMYdcM4wCQXqeGv8AgxbfR+c=
+
+Name: res/drawable-xhdpi-v4/ic_launcher.png
+SHA1-Digest: JJgB8R9E1B8lWVd1Qnh5dtICSn0=
+
+Name: assets/skin/default.fnt
+SHA1-Digest: uPgCNkNomrSmpslXLJjcrpX6wA8=
+
+Name: assets/COPYING
+SHA1-Digest: ZkTCK9aHlD3UTiH2cR4h9cpcPH8=
+
+Name: lib/armeabi-v7a/libgdx.so
+SHA1-Digest: /tPPxPZTWJl28vdKd8RHMsOT/Sc=
+
+Name: assets/font/medium.png
+SHA1-Digest: Qm5+Hr/OGq4XkIdYe/x3WlzH0dA=
+
+Name: com/badlogic/gdx/utils/arial-15.fnt
+SHA1-Digest: h1kLe7EvHfziUMbjLZoi18Hi4UI=
+

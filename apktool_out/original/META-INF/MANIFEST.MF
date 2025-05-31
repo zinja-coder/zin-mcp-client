@@ -1,0 +1,150 @@
+Manifest-Version: 1.0
+Created-By: 1.7.0_75 (Oracle Corporation)
+
+Name: com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl
+SHA1-Digest: eSLUEuPaE9IQZeP3HzG65WUVb74=
+
+Name: res/drawable-xxhdpi-v4/ic_launcher.png
+SHA1-Digest: h382Z9iPTQXvqhu8JUA3fPAy1zY=
+
+Name: assets/skin/uiskin.png
+SHA1-Digest: CuyBIlv7WyTdy7EvY9G9C5abxmo=
+
+Name: assets/font/large.fnt
+SHA1-Digest: atb8O0cv6QJvyl50YT67oeFFRK8=
+
+Name: assets/sound/alienshot.ogg
+SHA1-Digest: FAW1GcDK9YDONqmyntiAJnY0C3k=
+
+Name: assets/skin/default.png
+SHA1-Digest: XoT4IaUTzTCPoQvJ6in8WqAWAg4=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl
+SHA1-Digest: IIUjr+mcdXkUXEExKPM2/JawSZ0=
+
+Name: META-INF/buildserverid
+SHA1-Digest: 4ob0AiLRQEqVdzKRncElLEzeUYI=
+
+Name: resources.arsc
+SHA1-Digest: mr/J0aNyWRKOHOOK0bwZ/J+aIVA=
+
+Name: assets/sound/alienexplosion.ogg
+SHA1-Digest: 7oVZP4YHZaFm0w/KZKScaluqufI=
+
+Name: res/drawable-hdpi-v4/ic_launcher.png
+SHA1-Digest: 6et5obuk/N2hb30p+bTN849sKt4=
+
+Name: res/drawable-mdpi-v4/ic_launcher.png
+SHA1-Digest: lla/17tvy5RZPeVaSA1VMmPXA3I=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl
+SHA1-Digest: RPS515Fm1NTjmYxAmq5vzLZe594=
+
+Name: assets/font/small.fnt
+SHA1-Digest: w04lRM/qhHIgXgxcn+EVnBIZcdc=
+
+Name: assets/font/large.png
+SHA1-Digest: 32Ok6hXKPWe3YSyBOXgaOzucP9c=
+
+Name: AndroidManifest.xml
+SHA1-Digest: ItpS/Kz7tHrP2RgGzLvYagYMak4=
+
+Name: assets/skin/uiskin.json
+SHA1-Digest: zpKuo1VmJHieCXbg6AB+vGqNLe0=
+
+Name: lib/x86/libgdx.so
+SHA1-Digest: AwVs3VAC0p17M9R3kxjrxLNmtko=
+
+Name: assets/sound/click.ogg
+SHA1-Digest: n0CgI/rVmvLqDSXuFpNwGII6lFc=
+
+Name: assets/sound/playershot.ogg
+SHA1-Digest: bzubWXg1S47hGGyPMDtxky4CHVo=
+
+Name: assets/sound/playerexplosion.ogg
+SHA1-Digest: dKAFBJnlS3TOJgSXlemElxjl/QQ=
+
+Name: assets/sound/alienbossexplosion.ogg
+SHA1-Digest: 2EpRgZU2qeS2cnTbDcj/WFO2IOE=
+
+Name: assets/image/page0.png
+SHA1-Digest: GljbBUQxFbGNF/mLLLPCg/nXIS8=
+
+Name: assets/sound/alienbosshit.ogg
+SHA1-Digest: a34bDIEMWxpKunpqOPmsNFao6fA=
+
+Name: assets/font/medium.fnt
+SHA1-Digest: mm0KrobowvHSDY7Kn43TTz3e0dg=
+
+Name: assets/skin/uiskin.atlas
+SHA1-Digest: g38fEO62S4Bi2+P4t6oZxCRPuPc=
+
+Name: com/badlogic/gdx.gwt.xml
+SHA1-Digest: XvZRgIBDuqA+oupG3WEC8FUnZak=
+
+Name: assets/music/game.ogg
+SHA1-Digest: pAkhCMRnbpC6yEF6jlfAH+J01pQ=
+
+Name: com/badlogic/gdx/utils/JsonReader.rl
+SHA1-Digest: PQvjzf9nVM0dYig7KfWTQlmmvFs=
+
+Name: assets/splash.jpg
+SHA1-Digest: Eau/wxPb1m2Tg4MzbUkNR4ABIRs=
+
+Name: assets/music/menu.ogg
+SHA1-Digest: KdeEh95Vp/d6HYhNDHzsnNwJKJE=
+
+Name: assets/font/small.png
+SHA1-Digest: aM6jzws+1WLm8g3xQRNHiLnfu0I=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl
+SHA1-Digest: hv/gPfZsNJeCcsmsMKWmn5MJgJU=
+
+Name: com/badlogic/gdx/utils/XmlReader.rl
+SHA1-Digest: c6RepTyyUVFZoGqjdLXiIcOfIdo=
+
+Name: com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl
+SHA1-Digest: D1+gSAodKHAP+xlaCIsnStMy+yg=
+
+Name: com/badlogic/gdx/utils/arial-15.png
+SHA1-Digest: cNIREcVEJ4mg/sQa8fTMElWnwwo=
+
+Name: assets/image/page0.pack
+SHA1-Digest: +wlEPLj7BHeDcOalkQ26/cTkSbU=
+
+Name: META-INF/fdroidserverid
+SHA1-Digest: BSPD3FfrvEjqjs/eRC5mMXghWK0=
+
+Name: lib/armeabi/libgdx.so
+SHA1-Digest: Wle0MSarPk//h+W/QiDE2UYENq4=
+
+Name: classes.dex
+SHA1-Digest: 3/PCkueT1q1LNHwoFAgNMhy3uF0=
+
+Name: assets/sound/boing.ogg
+SHA1-Digest: yiArZdFD6VsLaa2yeVEBy24d8S0=
+
+Name: assets/sound/alienexplosion_.ogg
+SHA1-Digest: G2L7Z8xYbqxBYCv3QZ5HYkwnPt8=
+
+Name: com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl
+SHA1-Digest: 5e4qNnr/xUrdufGSIkcIR7U1aPM=
+
+Name: res/drawable-xhdpi-v4/ic_launcher.png
+SHA1-Digest: MuZPIdTNMYONvv2AhVSoq6oU4w4=
+
+Name: assets/COPYING
+SHA1-Digest: hiS82uVbru8AzRHV38+mD2hxCgI=
+
+Name: assets/skin/default.fnt
+SHA1-Digest: BQCibtdk9Boo+arlF9Cc0qsFtAU=
+
+Name: lib/armeabi-v7a/libgdx.so
+SHA1-Digest: laxjw/Vu1eKGaHjruJNXMcis/YY=
+
+Name: assets/font/medium.png
+SHA1-Digest: s02R8/HLEAaF5ng+fGaMhxM+8NM=
+
+Name: com/badlogic/gdx/utils/arial-15.fnt
+SHA1-Digest: lJMEBO6KXBGAB7uP2j2Odqe+ijQ=
+

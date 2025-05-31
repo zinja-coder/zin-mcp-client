@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <public type="drawable" name="ic_launcher" id="0x7f020000" />
+    <public type="string" name="app_name" id="0x7f030000" />
+    <public type="style" name="GdxTheme" id="0x7f040000" />
+</resources>
