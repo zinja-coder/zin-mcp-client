@@ -57,3 +57,10 @@ target/
 
 ### dependecy ###
 lib/
+
+### any apk file ###
+.apk
+
+
+### apktool mcp server output dir ###
+apktool_output/
