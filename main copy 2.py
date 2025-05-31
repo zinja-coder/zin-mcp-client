@@ -20,8 +20,8 @@
 # ///
 
 """
-Zin MCP Client - FastAPI Backend
-Copyright (c) 2025 Zin MCP Client Developer(s)
+Web MCP Client - FastAPI Backend
+Copyright (c) 2025 Web MCP Client Developer(s)
 """
 
 import json
@@ -137,8 +137,7 @@ class WebMCPClient:
             logger.error(f"Failed to connect to Ollama API: {str(e)}")
             return []
 
-    async def initialize_servers(self, server_names: List[str] = None, force_reinit: bool = False) -> bool:
-        """Initialize or reinitialize servers with optional cleanup"""
+    async def initialize_servers(self, server_names: List[str] = None) -> bool:
         if not self.config.get("mcpServers"):
             logger.error("No MCP Servers configured")
             return False
@@ -146,23 +145,9 @@ class WebMCPClient:
         servers = self.config["mcpServers"]
         server_names = server_names or list(servers.keys())
 
-        # Check if reinitialization is needed
-        current_servers = set(self.sessions.keys())
-        requested_servers = set(server_names)
-    
-        if not force_reinit and current_servers == requested_servers:
-            logger.info("Servers already initialized with same configuration")
-            return True
-
-        # Clean up existing sessions if needed
-        if current_servers or force_reinit:
-            logger.info("Cleaning up existing sessions for reinitialization")
-            await self.cleanup_sessions()
-            self.reset_agent()
-
         logger.info(f"Initializing Servers: {', '.join(server_names)}")
         initialized_servers = 0
-    
+        
         for server_name in server_names:
             if server_name not in servers:
                 logger.warning(f"Server '{server_name}' not found in config")
@@ -188,10 +173,10 @@ class WebMCPClient:
 
                 initialized_servers += 1
                 logger.info(f"Server {server_name} initialized with {len(tools)} tools")
-        
+            
             except Exception as e:
                 logger.error(f"Error initializing {server_name}: {str(e)}")
-        
+            
         return initialized_servers > 0
 
     async def initialize_llm(self, model_name: str) -> bool:
@@ -320,6 +305,22 @@ class WebMCPClient:
         logger.info("Resetting agent")
         self.agent = None
     
+    async def reinitialize_servers(self, server_names: List[str]) -> bool:
+        try:
+            """Clean up existing sessions and initialize new ones"""
+            logger.info(f"Reinitializing servers: {', '.join(server_names)}")
+        
+            # Clean up existing sessions
+            await self.cleanup_sessions()
+        
+            # Reset agent
+            self.reset_agent()
+        
+            # Initialize new servers
+            return await self.initialize_servers(server_names)
+        except Exception as e:
+            logger.error(f"Error in reinitialize: {e}")
+
     async def close(self):
         logger.info("Closing all MCP server connections")
         try:
@@ -335,394 +336,18 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥷 Zin MCP Client</title>
+    <title>🥷 Web MCP Client</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css">
-
-    <style>
- body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #0f0f0f;
-    min-height: 100vh;
-    color: #d1d5db;
-}
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: #121212;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-}
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #e5e7eb;
-}
-.header h1 {
-    margin: 0;
-    font-size: 2.5em;
-    color: #22c55e; /* green accent */
-}
-.section {
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #2c2c2c;
-    border-radius: 10px;
-    background-color: #1a1a1a;
-}
-.section h3 {
-    margin-top: 0;
-    color: #f1f1f1;
-    border-bottom: 2px solid #22c55e;
-    padding-bottom: 10px;
-}
-.form-group {
-    margin: 15px 0;
-}
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #d1d5db;
-}
-select, input, textarea, button {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #2c2c2c;
-    border-radius: 8px;
-    font-size: 16px;
-    background-color: #111;
-    color: #e5e5e5;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-select:focus, input:focus, textarea:focus {
-    outline: none;
-    border-color: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
-}
-button {
-    background-color: #22c55e;
-    color: #0f0f0f;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
-}
-button:disabled {
-    background-color: #374151;
-    color: #9ca3af;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-.status {
-    padding: 15px;
-    border-radius: 8px;
-    margin: 10px 0;
-    font-weight: 600;
-}
-.status.success {
-    background-color: #1e3a2a;
-    color: #9ae6b4;
-    border-left: 4px solid #22c55e;
-}
-.status.error {
-    background-color: #3c1e1e;
-    color: #feb2b2;
-    border-left: 4px solid #ef4444;
-}
-.status.info {
-    background-color: #1a2e1a;
-    color: #a7f3d0;
-    border-left: 4px solid #10b981;
-}
-.status.warning {
-    background-color: #3a2c14;
-    color: #fefcbf;
-    border-left: 4px solid #f59e0b;
-}
-.chat-container {
-    height: 400px;
-    overflow-y: auto;
-    border: 2px solid #2c2c2c;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #111;
-    margin-bottom: 15px;
-}
-.message {
-    margin: 15px 0;
-    padding: 15px;
-    border-radius: 10px;
-    animation: fadeIn 0.3s ease;
-}
-.message.user {
-    background-color: #166534;
-    color: white;
-    margin-left: 20%;
-}
-.message.assistant {
-    background-color: #1f1f1f;
-    border: 1px solid #2c2c2c;
-    color: #d1d5db;
-    margin-right: 20%;
-}
-.message.system {
-    background-color: #2a2a2a;
-    border: 1px solid #3b3b3b;
-    color: #9ca3af;
-    font-style: italic;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-.table th, .table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #2c2c2c;
-}
-.table th {
-    background-color: #1f1f1f;
-    font-weight: 600;
-    color: #e5e7eb;
-}
-.loading {
-    display: none;
-    text-align: center;
-    padding: 20px;
-}
-.spinner {
-    border: 4px solid #2c2c2c;
-    border-top: 4px solid #22c55e;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 10px;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.connection-status {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-.connected {
-    background-color: #1e3a2a;
-    color: #9ae6b4;
-}
-.disconnected {
-    background-color: #3c1e1e;
-    color: #feb2b2;
-}
-.endpoint-config {
-    background-color: #111;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-.inline-form {
-    display: flex;
-    gap: 10px;
-    align-items: end;
-}
-.inline-form .form-group {
-    flex: 1;
-    margin: 0;
-}
-.inline-form button {
-    min-width: 120px;
-    height: 48px;
-}
-
-/* Markdown rendering styles */
-.message-content {
-    line-height: 1.6;
-}
-
-.message-content h1, .message-content h2, .message-content h3, 
-.message-content h4, .message-content h5, .message-content h6 {
-    margin: 1em 0 0.5em 0;
-    color: #22c55e;
-}
-
-.message-content h1 { font-size: 1.5em; }
-.message-content h2 { font-size: 1.3em; }
-.message-content h3 { font-size: 1.1em; }
-
-.message-content p {
-    margin: 0.8em 0;
-}
-
-.message-content ul, .message-content ol {
-    margin: 0.8em 0;
-    padding-left: 2em;
-}
-
-.message-content li {
-    margin: 0.4em 0;
-}
-
-.message-content blockquote {
-    border-left: 4px solid #22c55e;
-    margin: 1em 0;
-    padding: 0.5em 0 0.5em 1em;
-    background-color: rgba(34, 197, 94, 0.1);
-    border-radius: 0 5px 5px 0;
-}
-
-.message-content code {
-    background-color: #1f1f1f;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    color: #22c55e;
-    border: 1px solid #2c2c2c;
-}
-
-.message-content pre {
-    background-color: #1f1f1f;
-    border: 1px solid #2c2c2c;
-    border-radius: 8px;
-    padding: 1em;
-    overflow-x: auto;
-    margin: 1em 0;
-}
-
-.message-content pre code {
-    background: none;
-    border: none;
-    padding: 0;
-    color: inherit;
-}
-
-.message-content table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-}
-
-.message-content th, .message-content td {
-    border: 1px solid #2c2c2c;
-    padding: 8px 12px;
-    text-align: left;
-}
-
-.message-content th {
-    background-color: #1f1f1f;
-    font-weight: 600;
-}
-
-.message-content a {
-    color: #22c55e;
-    text-decoration: none;
-}
-
-.message-content a:hover {
-    text-decoration: underline;
-}
-
-.message-content strong {
-    color: #f1f1f1;
-    font-weight: 600;
-}
-
-.message-content em {
-    color: #d1d5db;
-    font-style: italic;
-}
-
-.server-checkboxes {
-    border: 2px solid #2c2c2c;
-    border-radius: 8px;
-    padding: 15px;
-    background-color: #111;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-.server-checkbox-item {
-    display: flex;
-    align-items: center;
-    margin: 8px 0;
-    padding: 5px;
-}
-
-.server-checkbox-item input[type="checkbox"] {
-    width: auto;
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-.server-checkbox-item label {
-    margin: 0;
-    cursor: pointer;
-    flex: 1;
-}
-
-.server-checkbox-item:hover {
-    background-color: #1a1a1a;
-    border-radius: 4px;
-}
-
-.status-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.status-item {
-    padding: 8px 12px;
-    border-radius: 5px;
-    background-color: #1a1a1a;
-    border: 1px solid #2c2c2c;
-}
-
-.status-item strong {
-    color: #22c55e;
-}
-
-.reinit-warning {
-    background-color: #3a2c14;
-    color: #fefcbf;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0;
-    border-left: 4px solid #f59e0b;
-}
 
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🥷 Zin MCP Client</h1>
+            <h1>🥷 Web MCP Client</h1>
             <p>Model Context Protocol Client with Web Interface</p>
         </div>
 
@@ -748,6 +373,7 @@ button:disabled {
     <div class="inline-form">
         <button onclick="loadModels()" style="flex: 0 0 150px;">Load Models</button>
         <button id="initBtn" onclick="initializeSystem()" disabled>Initialize System</button>
+        <button id="reinitBtn" onclick="reinitializeServers()" disabled style="display: none;">Reinitialize Servers</button>
     </div>
     <div id="initStatus"></div>
  
@@ -931,48 +557,26 @@ async function initializeSystem() {
         return;
     }
 
-    // Determine if this is a reinitialization
-    const isReinit = systemInitialized && currentActiveServers.length > 0;
-    const serversChanged = JSON.stringify(selectedServers.sort()) !== JSON.stringify(currentActiveServers.sort());
-    
-    if (isReinit && !serversChanged) {
-        showStatus('initStatus', 'Server selection unchanged. No reinitialization needed.', 'info');
-        return;
-    }
-
     const initBtn = document.getElementById('initBtn');
-    
-   
-    
-
-    // Disable chat during (re)initialization
-    document.getElementById('sendBtn').disabled = true;
-    document.getElementById('queryInput').disabled = true;
+    initBtn.disabled = true;
+    initBtn.textContent = 'Initializing...';
 
     try {
-        // Initialize/Reinitialize LLM only if not already done or if reinitializing
-        if (!systemInitialized || isReinit) {
-            showStatus('initStatus', 'Initializing LLM...', 'info');
-            const llmResponse = await fetch(`${apiEndpoint}/api/initialize-llm`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: selectedModel })
-            });
+        // Initialize LLM
+        showStatus('initStatus', 'Initializing LLM...', 'info');
+        const llmResponse = await fetch(`${apiEndpoint}/api/initialize-llm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: selectedModel })
+        });
 
-            if (!llmResponse.ok) {
-                const error = await llmResponse.json().catch(() => ({}));
-                throw new Error(error.detail || `HTTP ${llmResponse.status}`);
-            }
+        if (!llmResponse.ok) {
+            const error = await llmResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${llmResponse.status}`);
         }
 
-        // Initialize/Reinitialize servers (this handles both scenarios)
-        const action = isReinit ? 'Reinitializing' : 'Initializing';
-        showStatus('initStatus', `${action} selected MCP servers: ${selectedServers.join(', ')}...`, 'info');
-        
-        if (isReinit) {
-            addMessage(`${action} system with new server selection: ${selectedServers.join(', ')}. Previous agent will be replaced.`, 'system');
-        }
-
+        // Initialize selected servers
+        showStatus('initStatus', `Initializing selected MCP servers: ${selectedServers.join(', ')}...`, 'info');
         const serversResponse = await fetch(`${apiEndpoint}/api/initialize-servers`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -983,8 +587,6 @@ async function initializeSystem() {
             const error = await serversResponse.json().catch(() => ({}));
             throw new Error(error.detail || `HTTP ${serversResponse.status}`);
         }
-
-        const serverResult = await serversResponse.json();
 
         // Create agent
         showStatus('initStatus', 'Creating agent...', 'info');
@@ -997,37 +599,113 @@ async function initializeSystem() {
             throw new Error(error.detail || `HTTP ${agentResponse.status}`);
         }
 
-        showStatus('initStatus', `System ${serverResult.action} successfully with servers: ${selectedServers.join(', ')}!`, 'success');
+        showStatus('initStatus', `System initialized successfully with servers: ${selectedServers.join(', ')}!`, 'success');
         systemInitialized = true;
         currentActiveServers = [...selectedServers];
         
-        // Enable chat functionality
+        // Enable chat and show reinitialize option
         document.getElementById('sendBtn').disabled = false;
         document.getElementById('queryInput').disabled = false;
+        document.getElementById('reinitBtn').style.display = 'inline-block';
+        document.getElementById('reinitBtn').disabled = false;
         
-     
         // Add success message to chat
-        const actionPast = serverResult.action === 'reinitialized' ? 'reinitialized' : 'initialized';
-        addMessage(`System ${actionPast} successfully with MCP servers: ${selectedServers.join(', ')}! You can now start chatting.`, 'system');
+        addMessage(`System initialized successfully with MCP servers: ${selectedServers.join(', ')}! You can now start chatting.`, 'system');
         
         // Load system info
         await loadSystemInfo();
 
     } catch (error) {
-        console.error(`${isReinit ? 'Reinitialization' : 'Initialization'} error:`, error);
-        const action = isReinit ? 'Reinitialization' : 'Initialization';
-        showStatus('initStatus', `${action} failed: ${error.message}`, 'error');
-        addMessage(`${action} failed: ${error.message}`, 'system');
+        console.error('Initialization error:', error);
+        showStatus('initStatus', `Initialization failed: ${error.message}`, 'error');
+        addMessage(`Initialization failed: ${error.message}`, 'system');
+    } finally {
+        initBtn.disabled = false;
+        initBtn.textContent = 'Initialize System';
+    }
+}
+
+// New function for reinitialization
+async function reinitializeServers() {
+    const selectedServers = getSelectedServers();
+    if (selectedServers.length === 0) {
+        showStatus('initStatus', 'Please select at least one MCP server', 'error');
+        return;
+    }
+
+    // Check if selection has changed
+    const serversChanged = JSON.stringify(selectedServers.sort()) !== JSON.stringify(currentActiveServers.sort());
+    if (!serversChanged) {
+        showStatus('initStatus', 'Server selection unchanged. No reinitialization needed.', 'info');
+        return;
+    }
+
+    const reinitBtn = document.getElementById('reinitBtn');
+    reinitBtn.disabled = true;
+    reinitBtn.textContent = 'Reinitializing...';
+
+    // Disable chat during reinitialization
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('queryInput').disabled = true;
+
+    try {
+        showStatus('initStatus', `Cleaning up existing servers and reinitializing with: ${selectedServers.join(', ')}...`, 'info');
         
-        // Try to restore chat functionality if previously working
-        if (systemInitialized && isReinit) {
+        // Add warning message to chat
+        addMessage(`Reinitializing system with new server selection: ${selectedServers.join(', ')}. Previous agent will be replaced.`, 'system');
+
+        const serversResponse = await fetch(`${apiEndpoint}/api/reinitialize-servers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ server_names: selectedServers })
+        });
+
+        if (!serversResponse.ok) {
+            const error = await serversResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${serversResponse.status}`);
+        }
+
+        // Create new agent
+        showStatus('initStatus', 'Creating new agent with selected servers...', 'info');
+        const agentResponse = await fetch(`${apiEndpoint}/api/create-agent`, {
+            method: 'POST'
+        });
+
+        if (!agentResponse.ok) {
+            const error = await agentResponse.json().catch(() => ({}));
+            throw new Error(error.detail || `HTTP ${agentResponse.status}`);
+        }
+
+        currentActiveServers = [...selectedServers];
+        
+        showStatus('initStatus', `System reinitialized successfully with servers: ${selectedServers.join(', ')}!`, 'success');
+        
+        // Re-enable chat
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('queryInput').disabled = false;
+        
+        // Add success message to chat
+        addMessage(`System reinitialized successfully! Now using MCP servers: ${selectedServers.join(', ')}`, 'system');
+        
+        // Reload system info
+        await loadSystemInfo();
+
+    } catch (error) {
+        console.error('Reinitialization error:', error);
+        showStatus('initStatus', `Reinitialization failed: ${error.message}`, 'error');
+        addMessage(`Reinitialization failed: ${error.message}`, 'system');
+        
+        // Try to restore chat functionality if possible
+        if (systemInitialized) {
             document.getElementById('sendBtn').disabled = false;
             document.getElementById('queryInput').disabled = false;
         }
     } finally {
-    
+        reinitBtn.disabled = false;
+        reinitBtn.textContent = 'Reinitialize Servers';
     }
 }
+
         async function sendQuery() {
             if (!systemInitialized) {
                 alert('Please initialize the system first');
@@ -1216,6 +894,23 @@ async def get_available_servers():
     servers = list(client.config.get("mcpServers", {}).keys())
     return {"servers": servers}
 
+# Modify the initialize-servers endpoint to accept server selection
+@app.post("/api/initialize-servers")
+async def initialize_servers(request: ServerSelectionRequest = None):
+    server_names = None
+    if request and request.server_names:
+        server_names = request.server_names
+    
+    success = await client.initialize_servers(server_names)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to initialize selected MCP servers")
+    
+    selected_servers = server_names or list(client.config.get("mcpServers", {}).keys())
+    return {
+        "status": "success", 
+        "message": f"MCP servers initialized: {', '.join(selected_servers)}",
+        "initialized_servers": selected_servers
+    }
 
 @app.post("/api/create-agent")
 async def create_agent():
@@ -1224,35 +919,6 @@ async def create_agent():
         raise HTTPException(status_code=500, detail="Failed to create agent")
     
     return {"status": "success", "message": "Agent created successfully"}
-
-
-# Modify the initialize-servers endpoint to accept server selection
-@app.post("/api/initialize-servers")
-async def initialize_servers_endpoint(request: ServerSelectionRequest = None):
-    """Initialize or reinitialize MCP servers"""
-    server_names = None
-    force_reinit = False
-    
-    if request:
-        server_names = request.server_names
-        # If servers are already running, force reinitialization
-        force_reinit = bool(client.sessions)
-    
-    success = await client.initialize_servers(server_names, force_reinit)
-    if not success:
-        action = "reinitialize" if force_reinit else "initialize"
-        raise HTTPException(status_code=500, detail=f"Failed to {action} selected MCP servers")
-    
-    selected_servers = server_names or list(client.config.get("mcpServers", {}).keys())
-    action = "reinitialized" if force_reinit else "initialized"
-    
-    return {
-        "status": "success", 
-        "message": f"MCP servers {action}: {', '.join(selected_servers)}",
-        "initialized_servers": selected_servers,
-        "action": action
-    }
-
 
 @app.post("/api/query")
 async def process_query(request: QueryRequest):
@@ -1266,6 +932,28 @@ async def get_servers():
 @app.get("/api/tools")
 async def get_tools():
     return client.get_tools_info()
+
+@app.post("/api/reinitialize-servers")
+async def reinitialize_servers(request: ServerSelectionRequest):
+    """Reinitialize servers with cleanup of existing ones"""
+    try:
+        if not request or not request.server_names:
+            raise HTTPException(status_code=400, detail="At least one server must be selected")
+        
+        success = await client.reinitialize_servers(request.server_names)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to reinitialize MCP servers")
+        
+        return {
+            "status": "success", 
+            "message": f"MCP servers reinitialized: {', '.join(request.server_names)}",
+            "initialized_servers": request.server_names
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in reinitialize_servers: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 # Add endpoint to check initialization status
 @app.get("/api/status")
@@ -1287,7 +975,7 @@ import os
 def main():
     global CONFIG_PATH
     
-    parser = argparse.ArgumentParser(description="Zin MCP Client")
+    parser = argparse.ArgumentParser(description="Web MCP Client")
     parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
     parser.add_argument("--config", default="mcp_config.json", help="Path to MCP configuration file")
@@ -1303,7 +991,7 @@ def main():
         print("Please create the configuration file or specify a valid path with --config")
         sys.exit(1)
     
-    print(f"Starting Zin MCP Client server...")
+    print(f"Starting Web MCP Client server...")
     print(f"Config file: {CONFIG_PATH}")
     print(f"Host: {args.host}")
     print(f"Port: {args.port}")
