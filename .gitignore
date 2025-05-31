@@ -11,6 +11,9 @@ wheels/
 
 logs/
 logs
+traffic.log
+.log
+.logs
 
 
 target/
