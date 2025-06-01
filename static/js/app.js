@@ -27,33 +27,83 @@ function getApiEndpoint() {
         'http://localhost:8000';
 }
 
-// Sidebar and mobile menu functionality
+// Enhanced sidebar and hamburger menu functionality
 function initializeSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     
-    // Mobile menu toggle
-    mobileMenuBtn?.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-        sidebarOverlay.classList.toggle('active');
-    });
+    // Open sidebar
+    function openSidebar() {
+        sidebar.classList.add('active');
+        sidebarOverlay.classList.add('active');
+        hamburgerMenuBtn.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent body scroll
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+            mainContent.classList.add('sidebar-open');
+            console.log('sidebar-open added');
+        } else {
+            console.log('mainContent not found');
+        }
+    }
     
-    // Close sidebar when clicking overlay
-    sidebarOverlay?.addEventListener('click', () => {
+    // Close sidebar
+    function closeSidebar() {
         sidebar.classList.remove('active');
         sidebarOverlay.classList.remove('active');
+        hamburgerMenuBtn.classList.remove('active');
+        document.body.style.overflow = ''; // Restore body scroll
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+            mainContent.classList.remove('sidebar-open');
+            console.log('sidebar-open removed');
+        } else {
+            console.log('mainContent not found');
+        }
+    }
+    
+    // Hamburger menu toggle
+    hamburgerMenuBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sidebar.classList.contains('active')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+    
+    // Close button in sidebar
+    sidebarCloseBtn?.addEventListener('click', closeSidebar);
+    
+    // Close sidebar when clicking overlay
+    sidebarOverlay?.addEventListener('click', closeSidebar);
+    
+    // Close sidebar when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+            closeSidebar();
+        }
     });
     
     // Handle window resize
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
+        if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+            closeSidebar();
+        }
+    });
+    
+    // Close sidebar when clicking on main content links/buttons (for better UX)
+    document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            !hamburgerMenuBtn.contains(e.target)) {
+            closeSidebar();
         }
     });
 }
+
 
 // Accordion functionality
 function toggleAccordion(accordionId) {
@@ -271,6 +321,7 @@ function getSelectedServers() {
     return Array.from(checkboxes).map(cb => cb.value);
 }
 
+// Enhanced initialization with better status feedback
 async function initializeSystem() {
     const modelSelect = document.getElementById('modelSelect');
     const selectedModel = modelSelect.value;
@@ -294,7 +345,13 @@ async function initializeSystem() {
         return;
     }
 
+    // Update status indicator
+    updateConnectionStatus(true, 'Initializing...');
+    
     const initBtn = document.getElementById('initBtn');
+    const originalText = initBtn.textContent;
+    initBtn.disabled = true;
+    initBtn.textContent = 'Initializing...';
     
     document.getElementById('sendBtn').disabled = true;
     document.getElementById('queryInput').disabled = true;
@@ -302,6 +359,8 @@ async function initializeSystem() {
     try {
         if (!systemInitialized || isReinit) {
             showStatus('initStatus', 'Initializing LLM...', 'info');
+            updateConnectionStatus(true, 'Loading Model...');
+            
             const llmResponse = await fetch(`${apiEndpoint}/api/initialize-llm`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -316,6 +375,7 @@ async function initializeSystem() {
 
         const action = isReinit ? 'Reinitializing' : 'Initializing';
         showStatus('initStatus', `${action} selected MCP servers: ${selectedServers.join(', ')}...`, 'info');
+        updateConnectionStatus(true, 'Loading Servers...');
         
         if (isReinit) {
             addMessage(`${action} system with new server selection: ${selectedServers.join(', ')}. Previous agent will be replaced.`, 'system');
@@ -335,6 +395,8 @@ async function initializeSystem() {
         const serverResult = await serversResponse.json();
 
         showStatus('initStatus', 'Creating agent...', 'info');
+        updateConnectionStatus(true, 'Creating Agent...');
+        
         const agentResponse = await fetch(`${apiEndpoint}/api/create-agent`, {
             method: 'POST'
         });
@@ -345,6 +407,7 @@ async function initializeSystem() {
         }
 
         showStatus('initStatus', `System ${serverResult.action} successfully with servers: ${selectedServers.join(', ')}!`, 'success');
+        updateConnectionStatus(true, 'Ready');
         systemInitialized = true;
         currentActiveServers = [...selectedServers];
         
@@ -360,14 +423,34 @@ async function initializeSystem() {
         console.error(`${isReinit ? 'Reinitialization' : 'Initialization'} error:`, error);
         const action = isReinit ? 'Reinitialization' : 'Initialization';
         showStatus('initStatus', `${action} failed: ${error.message}`, 'error');
+        updateConnectionStatus(false, 'Error');
         addMessage(`${action} failed: ${error.message}`, 'system');
         
         if (systemInitialized && isReinit) {
             document.getElementById('sendBtn').disabled = false;
             document.getElementById('queryInput').disabled = false;
+            updateConnectionStatus(true, 'Ready');
         }
+    } finally {
+        initBtn.disabled = false;
+        initBtn.textContent = originalText;
     }
 }
+
+// Enhanced status indicator functionality
+function updateConnectionStatus(isConnected, statusText = '') {
+    const connectionIndicator = document.getElementById('connectionStatus');
+    const statusTextElement = document.getElementById('statusText');
+    
+    if (connectionIndicator) {
+        connectionIndicator.className = isConnected ? 'connection-indicator' : 'connection-indicator disconnected';
+    }
+    
+    if (statusTextElement && statusText) {
+        statusTextElement.textContent = statusText;
+    }
+}
+
 
 // Update the existing sendQuery function to use new loading indicator
 async function sendQuery() {
@@ -549,11 +632,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Enhanced test connection with status update
 async function testConnection() {
+    updateConnectionStatus(false, 'Connecting...');
+    
     try {
         const response = await fetch(`${apiEndpoint}/api/models`);
-        console.log('API connection test:', response.ok ? 'Success' : 'Failed');
+        const isConnected = response.ok;
+        
+        updateConnectionStatus(isConnected, isConnected ? 'Connected' : 'Connection Failed');
+        
+        console.log('API connection test:', isConnected ? 'Success' : 'Failed');
+        return isConnected;
     } catch (error) {
+        updateConnectionStatus(false, 'Offline');
         console.log('API connection test failed:', error.message);
+        return false;
     }
 }

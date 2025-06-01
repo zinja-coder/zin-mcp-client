@@ -11,19 +11,24 @@ body {
     overflow: hidden;
 }
 
-/* Sidebar Styles */
+/* Enhanced Sidebar Styles */
 .sidebar {
     position: fixed;
     left: 0;
     top: 0;
-    width: 320px;
+    width: 340px;
     height: 100vh;
-    background-color: #121212;
+    background: linear-gradient(180deg, #1a1a1a 0%, #121212 100%);
     border-right: 1px solid #2c2c2c;
     overflow-y: auto;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar.active {
+    transform: translateX(0);
 }
 
 .sidebar-header {
@@ -32,54 +37,223 @@ body {
     justify-content: space-between;
     padding: 20px;
     border-bottom: 1px solid #2c2c2c;
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .sidebar-header h2 {
     margin: 0;
-    color: #22c55e;
     font-size: 1.5em;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.sidebar-toggle {
-    display: none;
+.sidebar-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* Enhanced Chat Header */
+.chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #2c2c2c;
+    background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.hamburger-menu-btn {
     background: none;
     border: none;
     cursor: pointer;
+    display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 5px;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
 }
 
-.hamburger {
-    width: 20px;
+.hamburger-menu-btn:hover {
+    background-color: rgba(34, 197, 94, 0.1);
+    transform: scale(1.05);
+}
+
+.hamburger-line {
+    width: 22px;
     height: 2px;
     background-color: #d1d5db;
-    transition: 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
 }
 
-.sidebar-section {
-    padding: 20px;
-    border-bottom: 1px solid #2c2c2c;
+/* Animated hamburger to X transformation */
+.hamburger-menu-btn.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+    background-color: #22c55e;
 }
 
-.sidebar-section h3 {
-    margin: 0 0 15px 0;
-    color: #f1f1f1;
-    font-size: 1.1em;
+.hamburger-menu-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.hamburger-menu-btn.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+    background-color: #22c55e;
+}
+
+/* Header Status Indicator */
+.header-status {
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 6px 12px;
+    background-color: #1a1a1a;
+    border-radius: 20px;
+    border: 1px solid #2c2c2c;
 }
 
-.sidebar-select {
+.connection-indicator {
+    font-size: 12px;
+    color: #22c55e;
+    animation: pulse 2s infinite;
+}
+
+.connection-indicator.disconnected {
+    color: #ef4444;
+}
+
+#statusText {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Enhanced Main Content */
+.main-content {
+    margin-left: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #0f0f0f;
+    transition: none;
+}
+
+/* Enhanced Sidebar Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 10px;
-    background-color: #1a1a1a;
-    border: 1px solid #2c2c2c;
-    border-radius: 8px;
-    color: #d1d5db;
-    font-size: 14px;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Enhanced Sidebar Sections */
+.sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid rgba(44, 44, 44, 0.5);
+    background: linear-gradient(135deg, transparent 0%, rgba(34, 197, 94, 0.02) 100%);
+}
+
+.sidebar-section:hover {
+    background: linear-gradient(135deg, transparent 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+/* Pulse animation for connection indicator */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive Design - Fixed Mobile Menu */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+        /* Prevent content from shifting when sidebar opens */
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Push main content when sidebar is active on mobile */
+    .main-content.sidebar-open {
+        transform: translateX(280px);
+        transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Ensure sidebar stays above main content but below overlay */
+    .sidebar {
+        z-index: 1000;
+    }
 }
 
 .init-button {
@@ -142,15 +316,6 @@ body {
     padding: 10px 0;
 }
 
-/* Main Content */
-.main-content {
-    margin-left: 320px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-color: #0f0f0f;
-    transition: margin-left 0.3s ease;
-}
 
 .chat-header {
     padding: 20px;
@@ -387,44 +552,6 @@ body {
     background-color: #3a2c14;
     color: #fefcbf;
     border-left-color: #f59e0b;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        width: 280px;
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-    
-    .mobile-menu-btn {
-        display: flex;
-    }
-    
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .sidebar-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
 }
 
 /* Animations */
