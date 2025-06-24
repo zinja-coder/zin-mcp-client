@@ -104,3 +104,26 @@ class WebMCPClient:
         self._exit_stack = AsyncExitStack()
         
         logger.info(f"Zin Web MCP Client initialized with config from {config_path}")
+        
+    def _load_config(self) -> dict:
+        try:
+            with open(self.config_path, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"Config file not found at {self.config_path}")
+            return {"mcpServers": {}}
+
+    async def get_ollama_models(self) -> List[str]:
+        logger.info("Fetching Ollama models")
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("http://127.0.0.1:11434/api/tags")
+                data = response.json()
+                models = [model["name"] for model in data.get("models", [])]
+                logger.info(f"Found {len(models)} Ollama models")
+                return models
+        except (httpx.ConnectError, httpx.RequestError) as e:
+            logger.error(f"Failed to connect to Ollama API: {str(e)}")
+            return []
+        
+    
