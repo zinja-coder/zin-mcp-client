@@ -1,0 +1,46 @@
+{
+    "mcpServers": {
+        "jadx-mcp-server": {
+            "command": "/home/zinjacoder/.local/bin/uv", 
+            "args": [
+                "--directory",
+                "/home/zinjacoder/softwares/tools/built/jadx-mcp-server/",
+                "run",
+                "jadx_mcp_server.py"
+            ]
+        },
+        "apktool-mcp-server": {
+		    "command": "/home/zinjacoder/.local/bin/uv",
+            "args": [
+                "--directory",
+                "/home/zinjacoder/softwares/tools/built/apktool-mcp-server/",
+                "run",
+                "apktool_mcp_server.py"
+            ]
+	    },
+        "browser-bruter-mcp-server": {
+            "command": "/home/zinjacoder/.local/bin/uv",
+            "args": [
+                "--directory",
+                "/home/zinjacoder/softwares/tools/built/BrowserBruter/modules/mcp/",
+                "run",
+                "browser_bruter_mcp_server.py"
+            ]
+        },
+        "ghidra": {
+            "command": "python",
+            "args": [
+                "/home/zinjacoder/softwares/tools/RE-Malware/GhidraMCP/bridge_mcp_ghidra.py",
+                "--ghidra-server",
+                "http://127.0.0.1:8080/"
+            ]
+        },
+         "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ]
+    }
+    }
+}

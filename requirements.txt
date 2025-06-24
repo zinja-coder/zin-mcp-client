@@ -6,3 +6,4 @@ langgraph
 langchain_ollama
 rich
 typer
+fastapi

@@ -60,11 +60,14 @@ https://github.com/user-attachments/assets/759f7138-1cc5-400f-b7e2-a6a7f0dca894
 
 > [!NOTE]
 >
+> **This project is in active development**. Expect breaking changes with releases. Review the release changelog before updating.
+> |:--------------------------------|
+> This project is primarily built to used with local llm for personal small scale use only. Exposing this on network may pose security risk and not thus not encouraged.
+> |:--------------------------------|
 >  This project is mainly developed for Zin MCP Servers which are below mentioned MCP Servers, while other STDIO based MCP Servers should work in theory testing is done on following servers only.
 
  - **[APKTool-MCP-Server](https://github.com/zinja-coder/apktool-mcp-server)**
  - **[JADX-MCP-Server](https://github.com/zinja-coder/jadx-mcp-server)**
-
 
 ## 🛠️ Getting Started 
 
