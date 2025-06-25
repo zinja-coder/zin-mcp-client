@@ -53,7 +53,7 @@ https://github.com/user-attachments/assets/704c214b-0ebb-4da9-971c-5f04446e9646
 - **Local LLM Integration:** Use local LLMs via Ollama for privacy and control
 - **Interactive CLI:** Clean, intuitive command-line interface with rich formatting
 - **Minimal Light Weight Web UI:** Clean, minimal, lightweight web ui for ease of use
-- **Open Web UI Integration:** Plug n Play integration with Open Web UI to get rich features of Open Web UI with strong MCP Client
+- **Open Web UI Integration:** Plug n Play integration with [Open Web UI](https://github.com/open-webui/open-webui) to get rich features of [Open Web UI](https://github.com/open-webui/open-webui) with strong MCP Client
 - **Comprehensive Logging:** Detailed logs for debugging and troubleshooting
 - **ReAct Agent Framework:** Utilizes LangChain's ReAct agent pattern to intelligently invoke tools
 - **Cross Platform:** Cross Platform Support
@@ -67,9 +67,9 @@ https://github.com/user-attachments/assets/704c214b-0ebb-4da9-971c-5f04446e9646
 >
 > **This project is in active development**. Expect breaking changes with releases. Review the release changelog before updating.
 > |:--------------------------------|
-> This project is primarily built to used with local llm for personal small scale use only. Exposing this on network may pose security risk and not thus not encouraged.
+> This project is primarily built to used with local llm for personal small scale use only. Exposing this on network may pose security risk and thus not encouraged.
 > |:--------------------------------|
->  This project is mainly developed for Zin MCP Servers which are below mentioned MCP Servers, while other STDIO based MCP Servers should work in theory testing is done on following servers only.
+>  This project is mainly developed for Zin MCP Servers which are below mentioned MCP Servers, But support for other MCP Servers is there and testing is also done on other MCP Servers such as Ghidra
 
  - **[APKTool-MCP-Server](https://github.com/zinja-coder/apktool-mcp-server)**
  - **[JADX-MCP-Server](https://github.com/zinja-coder/jadx-mcp-server)**
@@ -84,6 +84,9 @@ unzip zin-mcp-client-<version>.zip
 
 ├zin-mcp-client/
   ├── zin_mcp_client.py
+  ├── web_client.py
+  ├── mcp_proxy.py
+  ├── static/
   ├── src/
   ├── mcp-config.json
   ├── README.md
