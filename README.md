@@ -257,7 +257,9 @@ Add the URL for MCP Proxy running on port 8000 with localhost if running locally
 
 ![image](https://github.com/user-attachments/assets/51ca111e-7e57-4a30-baf9-e989faedf630)
 
-Current State Of Local LLM and MCPs:
+---
+
+## Current State Of Local LLM and MCPs:
 
 Currently, proprietary API-based models like Anthropic’s Claude tend to be more proficient proficient at tool calling. 
 
