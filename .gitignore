@@ -15,6 +15,9 @@ traffic.log
 .log
 .logs
 
+# copy backup files
+*copy*
+
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
