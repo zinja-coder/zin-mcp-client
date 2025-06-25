@@ -235,19 +235,22 @@ However, the open-source world is advancing rapidly! Models specifically fine-tu
 ---
 
 ## 🛣️ Future Roadmap
+ - [x] Web UI
+ 
+ - [x] Integrate with Open Web UI
 
- - [ ] Add Support HTTP based MCP Servers
+ - [x] Add Support HTTP based MCP Servers - Because a lot servers provide a way to make their servers act as a STDIO based.
 
- - [ ] Add support exposing this client on network as well
+ - [x] Add support exposing this client on network as well, Indirectly for network access - done indirectly via open web ui integration
 
- - [ ] Store chat locally and provide chat history
+ - [x] Store chat locally and provide chat history - done indirectly via open web ui integration
 
  - [ ] **END-GOAL** : Make all reverse engineering MCP Servers, bring them together, to make reverse engineering as easy as possible purely from vibes.
 
 ## To report bugs, issues, feature suggestion, Performance issue, general question, Documentation issue.
  - Kindly open an issue with respective template.
 
- - Tested on Mac OS and Linux environment with jadx-mcp-server
+ - Tested on Mac OS and Linux environment with jadx-mcp-server, Ghidra MCP Server
 
 ## 🙏 Credits
 
