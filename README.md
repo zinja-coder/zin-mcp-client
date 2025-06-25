@@ -39,6 +39,10 @@ https://github.com/user-attachments/assets/fad3d994-8113-47df-b10c-54541a5c3aec
 
 https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
 
+- **Plug n Play support for Open Web UI**
+
+https://github.com/user-attachments/assets/94e1ff33-0c88-40a8-8447-d9c3278a1d50
+
 - **Supports Multiple Servers - [GhidraMCP Server](https://github.com/LaurieWired/GhidraMCP)**
   
 https://github.com/user-attachments/assets/759f7138-1cc5-400f-b7e2-a6a7f0dca894
