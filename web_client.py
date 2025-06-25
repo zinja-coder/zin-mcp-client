@@ -31,6 +31,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from mcp import ClientSession
 from mcp.client.stdio import stdio_client, StdioServerParameters
 from langchain_mcp_adapters.tools import load_mcp_tools
@@ -56,6 +57,14 @@ async def lifespan(app: FastAPI):
     
 # Initialize FastAPI app with lifespan
 app = FastAPI(title="Zin MCP Client", version="1.0.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Global client instance - will be initialized with CONFIG_PATH 
 # TO DO Provide option to configure the path
