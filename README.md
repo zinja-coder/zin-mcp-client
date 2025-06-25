@@ -226,6 +226,19 @@ https://github.com/user-attachments/assets/ee478917-c4f5-46fb-9f0e-ad31d7c33ee0
 
 - If you can not resolve the error on you own, use the logs and debug mode's output and provide them to us by opening an issue at https://github.com/zinja-coder/zin-mcp-client/issues
 
+## Web Client
+1. Done configuration mentioned above
+2. Run web client using following:
+
+```bash
+uv run web_client.py
+```
+3. Demo of the web client is shown in video at top. 
+
+## Setting up with Open Web UI
+
+![openwebuilogo](https://avatars.githubusercontent.com/u/158137808?s=200&v=4)
+
 Current State Of Local LLM and MCPs:
 
 Currently, proprietary API-based models like Anthropic’s Claude tend to be more proficient proficient at tool calling. 
