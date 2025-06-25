@@ -233,11 +233,29 @@ https://github.com/user-attachments/assets/ee478917-c4f5-46fb-9f0e-ad31d7c33ee0
 ```bash
 uv run web_client.py
 ```
-3. Demo of the web client is shown in video at top. 
+3. Demo of the web client is shown in video at [top](https://github.com/zinja-coder/zin-mcp-client?tab=readme-ov-file#-what-is-zin-mcp-client)
 
 ## Setting up with Open Web UI
 
 ![openwebuilogo](https://avatars.githubusercontent.com/u/158137808?s=200&v=4)
+
+1. Done configuration mentioned above.
+2. Run the MCP Proxy using following:
+
+```bash
+uv run mcp_proxy.py
+```
+
+3. Go to Open Web Ui portal.
+4. In Open Web UI -> Settings -> Connection -> add new connection as shown in below image
+
+![image](https://github.com/user-attachments/assets/07b49e4c-9818-4441-a9ee-4a7597749499)
+
+Add the URL for MCP Proxy running on port 8000 with localhost if running locally as shown in image. You can put anything in API key.
+
+5. Now prompt and utilize the MCP client, Plug n Play setup.
+
+![image](https://github.com/user-attachments/assets/51ca111e-7e57-4a30-baf9-e989faedf630)
 
 Current State Of Local LLM and MCPs:
 
