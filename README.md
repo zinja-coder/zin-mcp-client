@@ -2,7 +2,7 @@
 
 # ZIN-MCP-CLIENT (Part of Zin's MCP Suite)
 
-⚡ Lightweight, Fast, Simple, CLI-Based MCP Client for STDIO MCP Servers, to fill the gap and provide bridge between your local LLMs running Ollama and MCP Servers.
+⚡ Lightweight, Fast, Simple, Cross Platform, CLI, Web UI and Open Web UI based MCP Client for STDIO MCP Servers, to fill the gap and provide bridge between your local LLMs running Ollama and MCP Servers.
 
 ![GitHub contributors JADX-AI-MCP](https://img.shields.io/github/contributors/zinja-coder/zin-mcp-client)
 ![GitHub contributors JADX-MCP-SERVER](https://img.shields.io/github/contributors/zinja-coder/zin-mcp-client)
@@ -43,6 +43,9 @@ https://github.com/user-attachments/assets/4cd26715-b5e6-4b4b-95e4-054de6789f42
   
 https://github.com/user-attachments/assets/759f7138-1cc5-400f-b7e2-a6a7f0dca894
 
+- **Light Weight Web UI**
+
+https://github.com/user-attachments/assets/704c214b-0ebb-4da9-971c-5f04446e9646
 
 # Features
 
