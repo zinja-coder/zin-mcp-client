@@ -52,6 +52,8 @@ https://github.com/user-attachments/assets/704c214b-0ebb-4da9-971c-5f04446e9646
 - **Multi-Server Support:** Connect to multiple MCP servers simultaneously
 - **Local LLM Integration:** Use local LLMs via Ollama for privacy and control
 - **Interactive CLI:** Clean, intuitive command-line interface with rich formatting
+- **Minimal Light Weight Web UI:** Clean, minimal, lightweight web ui for ease of use
+- **Open Web UI Integration:** Plug n Play integration with Open Web UI to get rich features of Open Web UI with strong MCP Client
 - **Comprehensive Logging:** Detailed logs for debugging and troubleshooting
 - **ReAct Agent Framework:** Utilizes LangChain's ReAct agent pattern to intelligently invoke tools
 - **Cross Platform:** Cross Platform Support
