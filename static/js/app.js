@@ -6,7 +6,7 @@ let systemStatus = {
     active_servers: []
 };
 let systemInitialized = false;
-let apiEndpoint = 'http://localhost:8000';
+let apiEndpoint = 'http://127.0.0.1:8000';
 let availableServers = [];
 
 
@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function getApiEndpoint() {
     return document.getElementById('apiEndpoint') ? 
-        document.getElementById('apiEndpoint').value || 'http://localhost:8000' : 
-        'http://localhost:8000';
+        document.getElementById('apiEndpoint').value || 'http://127.0.0.1:8000' : 
+        'http://127.0.0.1:8000';
 }
 
 // Enhanced sidebar and hamburger menu functionality
